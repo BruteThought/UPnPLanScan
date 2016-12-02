@@ -99,4 +99,5 @@ while receiving:
 print("---FINISHED SCANNING---")
 for key in deviceDict:
     deviceDict[key].printinfo()
-    XMLReader.getServices(deviceDict[key].getLocation())
+    for service in XMLReader.getServices(deviceDict[key].getLocation()):
+        service.printInfo()
