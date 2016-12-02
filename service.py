@@ -8,7 +8,7 @@ class service:
 
     def printInfo(self):
         print("serviceType:\t" + self.type)
-        print("serviceId:\t\t" + self.id)
-        print("controlURL:\t\t" + self.controlURL)
+        print("serviceId:\t" + self.id)
+        print("controlURL:\t" + self.controlURL)
         print("eventSubURL:\t" + self.eventSubURL)
-        print("SCPDURL:\t\t" + self.SCPDURL)
+        print("SCPDURL:\t" + self.SCPDURL)

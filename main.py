@@ -74,6 +74,7 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 # timeout 5 seconds after the required response time to have a look at devices
 timeout = time.time()+ MX+5
 while receiving:
+    print("---STARTING SCAN---")
     message = str(sock.recv(10240),'utf-8')
     # If the protocol matches
     protocol = re.match(r'^.*', message)
@@ -99,5 +100,8 @@ while receiving:
 print("---FINISHED SCANNING---")
 for key in deviceDict:
     deviceDict[key].printinfo()
-    for service in XMLReader.getServices(deviceDict[key].getLocation()):
+    print("---Getting Device Services---")
+    for service in XMLReader.getServices(deviceDict[key].location):
+        print("Getting services of " + deviceDict[key].USN)
         service.printInfo()
+    print("---End Device Services---")

@@ -22,6 +22,3 @@ class mSearch:
         print("ST: " + self.st)
         print("USN: " + self.usn)
         print("----END DEVICE INFO----")
-
-    def getLocation(self):
-        return self.location
