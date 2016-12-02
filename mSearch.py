@@ -11,6 +11,7 @@ class mSearch:
         self.usn = usn
 
     def printinfo(self):
+        print("----START DEVICE INFO----")
         print("Cache: "+ self.cache)
         print("Date: " + self.date)
         print("Location: " + self.location)
@@ -20,3 +21,7 @@ class mSearch:
         print("User Agent: " + self.userAgent)
         print("ST: " + self.st)
         print("USN: " + self.usn)
+        print("----END DEVICE INFO----")
+
+    def getLocation(self):
+        return self.location

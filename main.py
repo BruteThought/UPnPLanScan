@@ -3,7 +3,8 @@ import struct
 import codecs
 import re
 import time
-from mSearch import *
+import XMLReader
+from mSearch import mSearch
 
 
 UDP_IP = "239.255.255.250"
@@ -15,7 +16,7 @@ MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
           "MX:" + str(MX) + "\r\n" \
           "MAN:\"ssdp:discover\"\r\n\r\n"
 
-devicedict = {}
+deviceDict = {}
 receiving = 1
 
 def decodepacket(packet):
@@ -83,9 +84,9 @@ while receiving:
         packet = decodepacket(codecs.getdecoder("unicode_escape")(message)[0])
 
         # Check the USN and put it into an array if there are no matches.
-        if not packet.usn in devicedict:
+        if not packet.usn in deviceDict:
             print("found device")
-            devicedict[packet.usn] = packet
+            deviceDict[packet.usn] = packet
 
     else:
         # Not the right protocol, discard
@@ -95,7 +96,6 @@ while receiving:
     if time.time() > timeout:
         break
 print("---FINISHED SCANNING---")
-for key in devicedict:
-    print("----START DEVICE INFO----")
-    devicedict[key].printinfo()
-    print("----END DEVICE INFO----")
+for key in deviceDict:
+    deviceDict[key].printinfo()
+    XMLReader.getServices(deviceDict[key].getLocation())
