@@ -1,10 +1,12 @@
 # TODO: try/catch for missing tags/files
 import re
+import urllib
 import xml.etree.ElementTree as ET
 from service import service
 
 
-def getServices(XMLDocument):
+def getServices(XMLURL):
+    XMLDocument = urllib.request.urlopen(XMLURL).read()
     tree = ET.parse(XMLDocument)
     root = tree.getroot()
     XMLNamespace = re.match('\{.*\}', root.tag).group(0)
