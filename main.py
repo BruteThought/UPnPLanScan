@@ -69,13 +69,15 @@ mreq = struct.pack("4sl", socket.inet_aton(UDP_IP), socket.INADDR_ANY)
 # mreq: set it to thea multicast address on all interfaces.
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
+sock.settimeout(5.0)
 
 # Start listening for responses
 # timeout 5 seconds after the required response time to have a look at devices
 timeout = time.time()+ MX+5
+print("---STARTING SCAN---")
 while receiving:
-    print("---STARTING SCAN---")
     message = str(sock.recv(10240),'utf-8')
+
     # If the protocol matches
     protocol = re.match(r'^.*', message)
     if protocol.group(0).strip() == "HTTP/1.1 200 OK":
@@ -102,6 +104,6 @@ for key in deviceDict:
     deviceDict[key].printinfo()
     print("---Getting Device Services---")
     for service in XMLReader.getServices(deviceDict[key].location):
-        print("Getting services of " + deviceDict[key].USN)
+        print("Getting services of " + deviceDict[key].usn)
         service.printInfo()
     print("---End Device Services---")
