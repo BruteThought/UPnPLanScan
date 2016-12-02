@@ -94,6 +94,7 @@ while receiving:
 
     # If sufficient time has passed, break out of it.
     if time.time() > timeout:
+        print("breaking")
         break
 print("---FINISHED SCANNING---")
 for key in deviceDict:
