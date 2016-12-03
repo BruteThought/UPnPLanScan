@@ -4,26 +4,15 @@ import xml.etree.ElementTree as ET
 from service import service
 from bcolors import bcolors
 
+
+def getActions(test):
+    print("Getting actions!")
+
 def getServices(XMLURL):
-    XMLDocument = ""
     serviceArray = []
-    attempts = 0
 
     print(bcolors.OKBLUE + "Attempting to open remote XML document" + bcolors.ENDC)
-    # if the XML fails, it should immediately be saved in raw form for later use.
-    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful
-    while attempts < 3:
-        try:
-            # TODO: have to properly validate whether or not it is a valid URL!
-            if XMLURL == "":
-                print(bcolors.FAIL + "No XML location given! Skipping." + bcolors.ENDC)
-                break
-            XMLDocument = urllib.request.urlopen(XMLURL).read()
-            print(bcolors.OKBLUE + "XML Document received" + bcolors.ENDC)
-            break
-        except urllib.error.URLError as e:
-            attempts += 1
-            print(bcolors.FAIL + "XML fetch error %d: %s" % (e.args[0], e.args[1]) + bcolors.ENDC)
+    XMLDocument = getXMLDocument(XMLURL)
 
     # If the document could not be obtained
     if XMLDocument is None:
@@ -50,10 +39,33 @@ def getServices(XMLURL):
                 serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
                 copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
                 eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
+                #Service control Protocol Document URL
                 SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
+                ActionList = getActions(XMLURL + "/../" + SCPDURL)
                 serviceArray.append(service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
         except:
             # TODO: this is not printing correctly in some cases, e.g. http://192.168.1.191:40001/ will
             # fuck with the output, not sure why.
             print(bcolors.FAIL + "Service XML Document at: '{0}' could not be parsed, skipping.".format(XMLURL) + bcolors.ENDC)
         return serviceArray
+
+def getXMLDocument(XMLURL):
+    # if the XML fails, it should immediately be saved in raw form for later use.
+    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful
+    XMLDocument = None
+    attempts = 0
+    while attempts < 3:
+        try:
+            # TODO: have to properly validate whether or not it is a valid URL!
+            if XMLURL == "":
+                print(bcolors.FAIL + "No XML location given! Skipping." + bcolors.ENDC)
+                break
+            XMLDocument = urllib.request.urlopen(XMLURL).read()
+            print(bcolors.OKBLUE + "XML Document received" + bcolors.ENDC)
+            return XMLDocument
+        except urllib.error.URLError as e:
+            attempts += 1
+            print(bcolors.FAIL + "XML fetch error %d: %s" % (e.args[0], e.args[1]) + bcolors.ENDC)
+    # If the document could not be obtained
+    return None
+

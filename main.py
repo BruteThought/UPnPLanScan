@@ -5,7 +5,7 @@ import re
 import time
 import XMLReader
 from bcolors import bcolors
-from mSearch import mSearch
+from mSearch import device
 
 
 UDP_IP = "239.255.255.250"
@@ -31,8 +31,8 @@ def decodepacket(packet):
         st = cleanReg(re.search(r'(?:ST: ?)(.*)', packet))
         usn = cleanReg(re.search(r'(?:USN: ?)(.*)', packet))
 
-        device = mSearch(cache, date, location, opt, nls, server, userAgent, st, usn)
-        return device
+        currentDevice = device(cache, date, location, opt, nls, server, userAgent, st, usn)
+        return currentDevice
 
 def cleanReg(result):
     if result:
@@ -102,14 +102,16 @@ while receiving:
         print("MX Timeout, stopping search")
         break
 
-print(bcolors.HEADER + "---FINISHED DEVICE SCAN---" + bcolors.ENDC + "\n")
+print(bcolors.HEADER + "---FINISHED DEVICE SCAN---" + bcolors.ENDC)
+print(bcolors.HEADER + str(len(deviceDict)) + " devices found. Scanning for services and actions." + bcolors.ENDC + "\n")
 for key in deviceDict:
     print(bcolors.OKGREEN + "----START DEVICE INFO----" + bcolors.ENDC)
     deviceDict[key].printinfo()
     print(bcolors.OKGREEN + "----END DEVICE INFO----" + bcolors.ENDC + "\n")
+
     print(bcolors.OKGREEN + "---Getting Device Services---" + bcolors.ENDC + "\n")
     print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn+ bcolors.ENDC)
-    serviceArray = XMLReader.getServices(str(deviceDict[key].location))
-    for service in serviceArray:
-        service.printInfo()
+    deviceDict[key].serviceList = XMLReader.getServices(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
+    #for service in deviceDict[key].serviceList:
+    #    service.printInfo()
     print(bcolors.OKGREEN + "---End Device Services---" + bcolors.ENDC + "\n")

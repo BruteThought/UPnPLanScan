@@ -1,4 +1,3 @@
-
 class service:
     def __init__(self, type, id, controlURL, eventSubURL, SCPDURL):
         self.type = type
@@ -6,6 +5,8 @@ class service:
         self.controlURL = controlURL
         self.eventSubURL = eventSubURL
         self.SCPDURL = SCPDURL
+        self.actionList = []
+        self.riskRanking = 0
 
     def printInfo(self):
         print("serviceType:\t" + self.type)
