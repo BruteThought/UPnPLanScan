@@ -48,6 +48,8 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 #Bind the socket to the port, then send it
 sock.bind(("", UDP_PORT))
+print(bcolors.HEADER + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
+print(bcolors.OKBLUE + "Sending M-SEARCH packet." + bcolors.ENDC)
 sock.sendto(bytes(MESSAGE, "utf-8"), (UDP_IP, UDP_PORT))
 
 # Reset the socket to receive instead, prepare to get all of the 200/OK packets
@@ -69,7 +71,7 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 # Start listening for responses
 # timeout 5 seconds after the required response time to have a look at devices
 timeout = time.time()+ MX+5
-print(bcolors.HEADER + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
+print(bcolors.OKBLUE + "Listening for UPnP packets on port {0}".format(UDP_PORT) + bcolors.ENDC)
 while receiving:
     try:
         sock.settimeout(5.0)
@@ -107,6 +109,7 @@ for key in deviceDict:
     print(bcolors.OKGREEN + "----END DEVICE INFO----" + bcolors.ENDC + "\n")
     print(bcolors.OKGREEN + "---Getting Device Services---" + bcolors.ENDC + "\n")
     print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn+ bcolors.ENDC)
-    for service in XMLReader.getServices(deviceDict[key].location):
+    serviceArray = XMLReader.getServices(str(deviceDict[key].location))
+    for service in serviceArray:
         service.printInfo()
     print(bcolors.OKGREEN + "---End Device Services---" + bcolors.ENDC + "\n")
