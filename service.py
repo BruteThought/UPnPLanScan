@@ -1,3 +1,4 @@
+
 class service:
     def __init__(self, type, id, controlURL, eventSubURL, SCPDURL):
         self.type = type
@@ -11,4 +12,4 @@ class service:
         print("serviceId:\t" + self.id)
         print("controlURL:\t" + self.controlURL)
         print("eventSubURL:\t" + self.eventSubURL)
-        print("SCPDURL:\t" + self.SCPDURL)
+        print("SCPDURL:\t" + self.SCPDURL + "\n")

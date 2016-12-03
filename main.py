@@ -4,6 +4,7 @@ import codecs
 import re
 import time
 import XMLReader
+from bcolors import bcolors
 from mSearch import mSearch
 
 
@@ -39,10 +40,6 @@ def cleanReg(result):
     else:
         return ""
 
-
-
-
-
 # Set up the UDP port, bind it, then send the M-SEARCH packet.
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -69,41 +66,47 @@ mreq = struct.pack("4sl", socket.inet_aton(UDP_IP), socket.INADDR_ANY)
 # mreq: set it to thea multicast address on all interfaces.
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-sock.settimeout(5.0)
-
 # Start listening for responses
 # timeout 5 seconds after the required response time to have a look at devices
 timeout = time.time()+ MX+5
-print("---STARTING SCAN---")
+print(bcolors.HEADER + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
 while receiving:
-    message = str(sock.recv(10240),'utf-8')
+    try:
+        sock.settimeout(5.0)
+        message = str(sock.recv(10240),'utf-8')
+    except socket.timeout as e:
+        # If sufficient time has passed, break out of it.
+        if time.time() > timeout:
+            print("Recv & MX timeout stopping search")
+            break
+
+    sock.settimeout(0)
 
     # If the protocol matches
     protocol = re.match(r'^.*', message)
     if protocol.group(0).strip() == "HTTP/1.1 200 OK":
-
         # Comb through the packet info and put it in a python object
-
         packet = decodepacket(codecs.getdecoder("unicode_escape")(message)[0])
 
         # Check the USN and put it into an array if there are no matches.
         if not packet.usn in deviceDict:
-            print("found device")
+            print("Found Device")
             deviceDict[packet.usn] = packet
-
     else:
         # Not the right protocol, discard
-        print("not correct protocol")
+        print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
 
-    # If sufficient time has passed, break out of it.
     if time.time() > timeout:
-        print("breaking")
+        print("MX Timeout, stopping search")
         break
-print("---FINISHED SCANNING---")
+
+print(bcolors.HEADER + "---FINISHED DEVICE SCAN---" + bcolors.ENDC + "\n")
 for key in deviceDict:
+    print(bcolors.OKGREEN + "----START DEVICE INFO----" + bcolors.ENDC)
     deviceDict[key].printinfo()
-    print("---Getting Device Services---")
+    print(bcolors.OKGREEN + "----END DEVICE INFO----" + bcolors.ENDC + "\n")
+    print(bcolors.OKGREEN + "---Getting Device Services---" + bcolors.ENDC + "\n")
+    print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn+ bcolors.ENDC)
     for service in XMLReader.getServices(deviceDict[key].location):
-        print("Getting services of " + deviceDict[key].usn)
         service.printInfo()
-    print("---End Device Services---")
+    print(bcolors.OKGREEN + "---End Device Services---" + bcolors.ENDC + "\n")
