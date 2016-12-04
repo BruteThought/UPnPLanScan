@@ -1,4 +1,7 @@
 from urllib.parse import urlparse
+
+
+# noinspection PyPep8Naming
 class device:
     def __init__(self, cache, date, location, opt, nls, server, userAgent, st, usn):
         self.cache = cache
@@ -18,7 +21,7 @@ class device:
         self.serviceList = []
 
     def printinfo(self):
-        print("Cache: "+ self.cache)
+        print("Cache: " + self.cache)
         print("Date: " + self.date)
         print("Location: " + self.baseURL + self.rootXML)
         print("Opt: " + self.opt)

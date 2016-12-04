@@ -1,12 +1,15 @@
 import re
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
+# noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 from service import service
 from bcolors import bcolors
 
 
-def getActions(test):
+def getActions(XMLURL):
     print("Getting actions!")
+
 
 def getServices(XMLURL):
     serviceArray = []
@@ -19,6 +22,7 @@ def getServices(XMLURL):
         print(bcolors.WARNING + "Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
     else:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
+        # TODO: narrow down this exception clause
         try:
             # Get the root of the structure
             root = ET.fromstring(XMLDocument)
@@ -39,9 +43,9 @@ def getServices(XMLURL):
                 serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
                 copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
                 eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
-                #Service control Protocol Document URL
+                # Service control Protocol Document URL
                 SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
-                ActionList = getActions(XMLURL + "/../" + SCPDURL)
+
                 serviceArray.append(service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
         except:
             # TODO: this is not printing correctly in some cases, e.g. http://192.168.1.191:40001/ will
@@ -49,10 +53,10 @@ def getServices(XMLURL):
             print(bcolors.FAIL + "Service XML Document at: '{0}' could not be parsed, skipping.".format(XMLURL) + bcolors.ENDC)
         return serviceArray
 
+
 def getXMLDocument(XMLURL):
     # if the XML fails, it should immediately be saved in raw form for later use.
     # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful
-    XMLDocument = None
     attempts = 0
     while attempts < 3:
         try:

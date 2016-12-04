@@ -1,7 +1,8 @@
+# noinspection PyPep8Naming
 class service:
-    def __init__(self, type, id, controlURL, eventSubURL, SCPDURL):
-        self.type = type
-        self.id = id
+    def __init__(self, deviceType, deviceId, controlURL, eventSubURL, SCPDURL):
+        self.type = deviceType
+        self.id = deviceId
         self.controlURL = controlURL
         self.eventSubURL = eventSubURL
         self.SCPDURL = SCPDURL
