@@ -8,13 +8,27 @@ from bcolors import bcolors
 
 
 def getActions(XMLURL):
-    print("Getting actions!")
+    print(bcolors.OKBLUE + "Attempting to open remote Actions XML document" + bcolors.ENDC)
+    print("-------------------")
+    print(XMLURL)
+    XMLDocument = getXMLDocument(XMLURL)
 
+    # If the document could not be obtained
+    if XMLDocument is None:
+        print(bcolors.WARNING + "Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
+    else:
+        try:
+            # Get the root of the structure
+            root = ET.fromstring(XMLDocument)
+        except:
+            # TODO: need to have a try catch for corrupted/non XML files at the provided location.
+            # TODO: narrow down this exception clause
+            print(bcolors.FAIL + "Actions XML Document at: '{0}' could not be parsed, skipping.".format(XMLURL) + bcolors.ENDC)
 
 def getServices(XMLURL):
     serviceArray = []
 
-    print(bcolors.OKBLUE + "Attempting to open remote XML document" + bcolors.ENDC)
+    print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
     XMLDocument = getXMLDocument(XMLURL)
 
     # If the document could not be obtained
@@ -69,7 +83,7 @@ def getXMLDocument(XMLURL):
             return XMLDocument
         except urllib.error.URLError as e:
             attempts += 1
-            print(bcolors.FAIL + "XML fetch error %d: %s" % (e.args[0], e.args[1]) + bcolors.ENDC)
+            print(bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + bcolors.ENDC)
     # If the document could not be obtained
     return None
 

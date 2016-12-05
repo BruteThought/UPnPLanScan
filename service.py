@@ -1,3 +1,6 @@
+from urllib.parse import urlparse
+
+
 # noinspection PyPep8Naming
 class service:
     def __init__(self, deviceType, deviceId, controlURL, eventSubURL, SCPDURL):
@@ -5,7 +8,8 @@ class service:
         self.id = deviceId
         self.controlURL = controlURL
         self.eventSubURL = eventSubURL
-        self.SCPDURL = SCPDURL
+        parsed_uri = urlparse(SCPDURL)
+        self.SCPDURL = '{uri.path}'.format(uri=parsed_uri).strip("/")
         self.actionList = []
         self.riskRanking = 0
 
