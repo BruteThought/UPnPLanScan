@@ -50,7 +50,7 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # Bind the socket to the port, then send it
 sock.bind(("", UDP_PORT))
-print(bcolors.HEADER + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
+print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
 print(bcolors.OKBLUE + "Sending M-SEARCH packet." + bcolors.ENDC)
 sock.sendto(bytes(MESSAGE, "utf-8"), (UDP_IP, UDP_PORT))
 
@@ -103,18 +103,16 @@ while receiving:
         print("MX Timeout, stopping search")
         break
 
-print(bcolors.HEADER + "---FINISHED DEVICE SCAN---" + bcolors.ENDC)
-print(bcolors.HEADER + str(len(deviceDict)) + " devices found. Scanning for services and actions." + bcolors.ENDC + "\n")
+print(bcolors.HEADER + bcolors.BOLD + "---FINISHED DEVICE SCAN---" + bcolors.ENDC + "\n")
+print(bcolors.HEADER + bcolors.BOLD + "--Devices Discovered: {0}. Scanning for services and actions.--".format(str(len(deviceDict))) + bcolors.ENDC + "\n")
 for key in deviceDict:
-    print(bcolors.OKGREEN + "----START DEVICE INFO----" + bcolors.ENDC)
     deviceDict[key].printinfo()
-    print(bcolors.OKGREEN + "----END DEVICE INFO----" + bcolors.ENDC + "\n")
 
-    print(bcolors.OKGREEN + "---Getting Device Services---" + bcolors.ENDC + "\n")
-    print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn + bcolors.ENDC)
+    #print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn + bcolors.ENDC)
     deviceDict[key].serviceList = XMLReader.getServices(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
-
+    print("") # Newline
     for service in deviceDict[key].serviceList:
         service.actionList = XMLReader.getActions(str(deviceDict[key].baseURL + service.SCPDURL))
         service.printInfo()
-    print(bcolors.OKGREEN + "---End Device Services---" + bcolors.ENDC + "\n")
+        service.printActions()
+        print("") # Newline

@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from bcolors import bcolors
 
 
 # noinspection PyPep8Naming
@@ -14,8 +15,12 @@ class service:
         self.riskRanking = 0
 
     def printInfo(self):
-        print("serviceType:\t" + self.type)
-        print("serviceId:\t" + self.id)
-        print("controlURL:\t" + self.controlURL)
-        print("eventSubURL:\t" + self.eventSubURL)
-        print("SCPDURL:\t" + self.SCPDURL + "\n")
+        print("\tserviceType:\t" + self.type)
+        print("\tserviceId:\t" + self.id)
+        print("\tcontrolURL:\t" + self.controlURL)
+        print("\teventSubURL:\t" + self.eventSubURL)
+        print("\tSCPDURL:\t" + self.SCPDURL)
+
+    def printActions(self):
+        for action in self.actionList:
+            print(bcolors.OKGREEN + "\t\t└ Action: {0}".format(action.name) + bcolors.ENDC)

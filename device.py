@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from bcolors import bcolors
 
 
 # noinspection PyPep8Naming
@@ -21,6 +22,7 @@ class device:
         self.serviceList = []
 
     def printinfo(self):
+        print(bcolors.BOLD + "USN: " + self.usn + bcolors.ENDC)
         print("Cache: " + self.cache)
         print("Date: " + self.date)
         print("Location: " + self.baseURL + self.rootXML)
@@ -29,4 +31,3 @@ class device:
         print("Server: " + self.server)
         print("User Agent: " + self.userAgent)
         print("ST: " + self.st)
-        print("USN: " + self.usn)
