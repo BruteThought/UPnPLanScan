@@ -73,6 +73,7 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 # timeout 5 seconds after the required response time to have a look at devices
 timeout = time.time() + MX+5
 print(bcolors.OKBLUE + "Listening for UPnP packets on port {0}".format(UDP_PORT) + bcolors.ENDC)
+message = ""
 while receiving:
     try:
         sock.settimeout(5.0)
