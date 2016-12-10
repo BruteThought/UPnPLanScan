@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from service import service
 from action import action
 from argument import argument
+from variable import variable
 from bcolors import bcolors
 
 
@@ -22,7 +23,11 @@ def getArguments(argumentList):
 
 
 def getActions(XMLURL):
+
+    # Should change everything into objects, THEN pass them around, rather than passing around XML then selectively parsing.
+
     actionArray = []
+    variableDict = {}
     #print(bcolors.OKBLUE + "Attempting to open remote Actions XML document" + bcolors.ENDC)
     XMLDocument = getXMLDocument(XMLURL)
 
@@ -40,11 +45,24 @@ def getActions(XMLURL):
             if XMLNamespace is None:
                 print(bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + bcolors.ENDC)
                 XMLNamespace = ""
-            actionList =  root.find(XMLNamespace + 'actionList')
+
+            actionList = root.find(XMLNamespace + 'actionList')
+            stateVariableList = root.find(XMLNamespace + 'serviceStateTable')
+
+            for variableNode in stateVariableList.findall(XMLNamespace + 'stateVariable'):
+                name = variableNode.find(XMLNamespace + 'name').text
+                dataType = variableNode.find(XMLNamespace + 'dataType').text
+                defaultValue = variableNode.find(XMLNamespace + 'defaultValue').text
+                variableDict[name] = variable(name, dataType, defaultValue)
+
             for actionNode in actionList.findall(XMLNamespace + 'action'):
                 name = actionNode.find(XMLNamespace + 'name').text
-                argumentList = actionNode.find(XMLNamespace + 'argumentList')
+
+                # Get the variableArray into a key/value structure, then pass it as an argument
+                argumentList = getArguments(actionNode.find(XMLNamespace + 'argumentList'))
                 actionArray.append(action(name, argumentList))
+
+
         except:
             # TODO: need to have a try catch for corrupted/non XML files at the provided location.
             # TODO: narrow down this exception clause
