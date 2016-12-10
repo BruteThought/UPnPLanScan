@@ -106,7 +106,7 @@ while receiving:
 print(bcolors.HEADER + bcolors.BOLD + "---FINISHED DEVICE SCAN---" + bcolors.ENDC + "\n")
 print(bcolors.HEADER + bcolors.BOLD + "--Devices Discovered: {0}. Scanning for services and actions.--".format(str(len(deviceDict))) + bcolors.ENDC + "\n")
 for key in deviceDict:
-    deviceDict[key].printinfo()
+    deviceDict[key].printInfo()
 
     #print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn + bcolors.ENDC)
     deviceDict[key].serviceList = XMLReader.getServices(str(deviceDict[key].baseURL + deviceDict[key].rootXML))

@@ -19,8 +19,10 @@ class service:
         print("\tserviceId:\t" + self.id)
         print("\tcontrolURL:\t" + self.controlURL)
         print("\teventSubURL:\t" + self.eventSubURL)
-        print("\tSCPDURL:\t" + self.SCPDURL)
+        print("\tSCPDURL:\t" + "/" + self.SCPDURL)
 
     def printActions(self):
         for action in self.actionList:
             print(bcolors.OKGREEN + "\t\t└ Action: {0}".format(action.name) + bcolors.ENDC)
+            for argument in action.argumentList:
+                print(bcolors.WARNING + "\t\t  {0}\t {1}".format(argument.direction, argument.name) + bcolors.ENDC)

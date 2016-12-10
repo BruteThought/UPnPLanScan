@@ -5,7 +5,20 @@ import urllib.error
 import xml.etree.ElementTree as ET
 from service import service
 from action import action
+from argument import argument
 from bcolors import bcolors
+
+
+def getArguments(argumentList):
+    # TODO: Try/Catch for this section
+    argumentArray = []
+    XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
+    for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
+        name = argumentNode.find(XMLNamespace + 'name').text
+        direction = argumentNode.find(XMLNamespace + 'direction').text
+        relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable').text
+        argumentArray.append(argument(name, direction, relatedStateVariable))
+    return argumentArray
 
 
 def getActions(XMLURL):

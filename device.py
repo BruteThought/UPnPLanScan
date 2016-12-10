@@ -21,13 +21,13 @@ class device:
         self.usn = usn
         self.serviceList = []
 
-    def printinfo(self):
-        print(bcolors.BOLD + "USN: " + self.usn + bcolors.ENDC)
-        print("Cache: " + self.cache)
-        print("Date: " + self.date)
-        print("Location: " + self.baseURL + self.rootXML)
-        print("Opt: " + self.opt)
-        print("NLS: " + self.nls)
-        print("Server: " + self.server)
-        print("User Agent: " + self.userAgent)
-        print("ST: " + self.st)
+    def printInfo(self):
+        print(bcolors.BOLD + "USN: \t\t" + self.usn + bcolors.ENDC)
+        print("Cache: \t\t" + self.cache)
+        print("Date: \t\t" + self.date)
+        print("Location: \t" + self.baseURL + self.rootXML)
+        print("Opt: \t\t" + self.opt)
+        print("NLS: \t\t" + self.nls)
+        print("Server: \t" + self.server)
+        print("User Agent: \t" + self.userAgent)
+        print("ST: \t\t" + self.st)
