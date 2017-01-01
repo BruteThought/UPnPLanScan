@@ -5,12 +5,12 @@ from bcolors import bcolors
 # noinspection PyPep8Naming
 class service:
     def __init__(self, deviceType, deviceId, controlURL, eventSubURL, SCPDURL):
-        self.type = deviceType
-        self.id = deviceId
-        self.controlURL = controlURL
-        self.eventSubURL = eventSubURL
+        self.type = str(deviceType)
+        self.id = str(deviceId)
+        self.controlURL = str(controlURL)
+        self.eventSubURL = str(eventSubURL)
         parsed_uri = urlparse(SCPDURL)
-        self.SCPDURL = '{uri.path}'.format(uri=parsed_uri).strip("/")
+        self.SCPDURL = str('{uri.path}'.format(uri=parsed_uri).strip("/"))
         self.actionList = []
         self.riskRanking = 0
 

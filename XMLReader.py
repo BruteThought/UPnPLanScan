@@ -10,7 +10,7 @@ from variable import variable
 from bcolors import bcolors
 
 
-def getArguments(argumentList):
+def get_arguments(argumentList):
     # TODO: Try/Catch for this section
     argumentArray = []
     XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
@@ -21,15 +21,15 @@ def getArguments(argumentList):
         argumentArray.append(argument(name, direction, relatedStateVariable))
     return argumentArray
 
-
-def getActions(XMLURL):
+# TODO: Should getting the arguments of an action be a separate function?
+def get_actions(XMLURL):
 
     # Should change everything into objects, THEN pass them around, rather than passing around XML then selectively parsing.
 
     actionArray = []
     variableDict = {}
-    #print(bcolors.OKBLUE + "Attempting to open remote Actions XML document" + bcolors.ENDC)
-    XMLDocument = getXMLDocument(XMLURL)
+    # print(bcolors.OKBLUE + "Attempting to open remote Actions XML document" + bcolors.ENDC)
+    XMLDocument = get_xml_document(XMLURL)
 
     # If the document could not be obtained
     if XMLDocument is None:
@@ -59,7 +59,7 @@ def getActions(XMLURL):
                 name = actionNode.find(XMLNamespace + 'name').text
 
                 # Get the variableArray into a key/value structure, then pass it as an argument
-                argumentList = getArguments(actionNode.find(XMLNamespace + 'argumentList'))
+                argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'))
                 actionArray.append(action(name, argumentList))
 
 
@@ -70,11 +70,11 @@ def getActions(XMLURL):
         return actionArray
 
 
-def getServices(XMLURL):
+def get_services(XMLURL):
     serviceArray = []
 
     #print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
-    XMLDocument = getXMLDocument(XMLURL)
+    XMLDocument = get_xml_document(XMLURL)
 
     # If the document could not be obtained
     if XMLDocument is None:
@@ -113,22 +113,23 @@ def getServices(XMLURL):
         return serviceArray
 
 
-def getXMLDocument(XMLURL):
-    # if the XML fails, it should immediately be saved in raw form for later use.
+def get_xml_document(XMLURL):
+    # TODO: if the XML fails, it should immediately be saved in raw form for later use.
     # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful
     attempts = 0
     while attempts < 3:
+        attempts += 1
+
+        # TODO: have to properly validate whether or not it is a valid URL!
+        if XMLURL == "":
+            print(bcolors.FAIL + "No XML location given! Skipping." + bcolors.ENDC)
+            break
         try:
-            # TODO: have to properly validate whether or not it is a valid URL!
-            if XMLURL == "":
-                print(bcolors.FAIL + "No XML location given! Skipping." + bcolors.ENDC)
-                break
             XMLDocument = urllib.request.urlopen(XMLURL).read()
-            #print(bcolors.OKBLUE + "XML Document received" + bcolors.ENDC)
             return XMLDocument
         except urllib.error.URLError as e:
-            attempts += 1
+            # If the document could not be obtained
             print(bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + bcolors.ENDC)
-    # If the document could not be obtained
+        except ValueError as e:
+            print(bcolors.FAIL + "{0}".format(e) + bcolors.ENDC)
     return None
-

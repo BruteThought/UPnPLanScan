@@ -94,11 +94,13 @@ while receiving:
 
         # Check the USN and put it into an array if there are no matches.
         if packet.usn not in deviceDict:
-            print("Found Device")
+            print("Found Device: " + str(packet.usn))
             deviceDict[packet.usn] = packet
     else:
         # Not the right protocol, discard
         print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
+        print(message)
+
 
     if time.time() > timeout:
         print("MX Timeout, stopping search")
@@ -110,10 +112,20 @@ for key in deviceDict:
     deviceDict[key].printInfo()
 
     #print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn + bcolors.ENDC)
-    deviceDict[key].serviceList = XMLReader.getServices(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
+
+    # Read the root manifest for services, then create a list of them
+    deviceDict[key].serviceList = XMLReader.get_services(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
     print("") # Newline
-    for service in deviceDict[key].serviceList:
-        service.actionList = XMLReader.getActions(str(deviceDict[key].baseURL + service.SCPDURL))
-        service.printInfo()
-        service.printActions()
-        print("") # Newline
+
+    # For each of the found services, get their actions (and by extension, their variables)
+    if deviceDict[key].serviceList is not None:
+        for service in deviceDict[key].serviceList:
+            service.actionList = XMLReader.get_actions(str(deviceDict[key].baseURL + service.SCPDURL))
+            # Output both the info and the actions of each service.
+            service.printInfo()
+            service.printActions()
+            print("") # Newline
+    else:
+        # If the services were unable to be obtained
+        print(bcolors.FAIL + "Could not obtain services from blank service list" + bcolors.ENDC)
+        print("")
