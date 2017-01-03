@@ -1,3 +1,4 @@
+import argparse
 import socket
 import struct
 import codecs
@@ -7,19 +8,21 @@ import XMLReader
 from bcolors import bcolors
 from device import device
 
-
-UDP_IP = "239.255.255.250"
-UDP_PORT = 1900
-MX = 10
-MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
-          "HOST:239.255.255.250:1900\r\n" \
-          "ST:upnp:rootdevice\r\n" \
-          "MX:" + str(MX) + "\r\n" \
-          "MAN:\"ssdp:discover\"\r\n\r\n"
-
 deviceDict = {}
 receiving = 1
 
+parser = argparse.ArgumentParser(description="A UPnP scanning, enumerating and fuzzing framework.")
+parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
+parser.add_argument("-t", "--timeout", type=int, default=10, help="maximum time for a device to respond in seconds (default: 10)")
+parser.add_argument("-i", "--ip", default="239.255.255.250", help="the broadcast IP used for the M-SEARCH request (default: 239.255.255.250)")
+parser.add_argument("-p", "--port", type=int, default=1900, help="the port for sending and receiving packets (default: 1900)")
+args = parser.parse_args()
+
+MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
+          "HOST:"+ str(args.ip)+ ":" + str(args.port) + "\r\n" \
+          "ST:upnp:rootdevice\r\n" \
+          "MX:" + str(args.timeout) + "\r\n" \
+          "MAN:\"ssdp:discover\"\r\n\r\n"
 
 def decodepacket(receivedPacket):
         cache = cleanReg(re.search(r'(?:CACHE-CONTROL: ?)(.*)', receivedPacket))
@@ -49,20 +52,22 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # Bind the socket to the port, then send it
-sock.bind(("", UDP_PORT))
+sock.bind(("", args.port))
 print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
-print(bcolors.OKBLUE + "Sending M-SEARCH packet." + bcolors.ENDC)
-sock.sendto(bytes(MESSAGE, "utf-8"), (UDP_IP, UDP_PORT))
+if args.verbosity:
+    print(bcolors.HEADER + "[*] Verbosity turned on" + bcolors.ENDC)
+print(bcolors.OKBLUE + "Sending M-SEARCH packet on '" + str(args.ip) + ":" + str(args.port) + "'" + bcolors.ENDC)
+sock.sendto(bytes(MESSAGE, "utf-8"), (args.ip, args.port))
 
 # Reset the socket to receive instead, prepare to get all of the 200/OK packets
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
-sock.bind(("", UDP_PORT))
+sock.bind(("", args.port))
 
 # 4sl = Four letter string signed long
 # Convert the UDP_IP to binary in network byte order
 # INADDR_ANY, receive it for any interface
-mreq = struct.pack("4sl", socket.inet_aton(UDP_IP), socket.INADDR_ANY)
+mreq = struct.pack("4sl", socket.inet_aton(args.ip), socket.INADDR_ANY)
 
 # IPPROTO_IP: socket options that apply to sockets for IPv4 address family
 # IP_ADD_MEMBERSHIP: add as a member of the multicast group
@@ -71,8 +76,8 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 # Start listening for responses
 # timeout 5 seconds after the required response time to have a look at devices
-timeout = time.time() + MX+5
-print(bcolors.OKBLUE + "Listening for UPnP packets on port {0}".format(UDP_PORT) + bcolors.ENDC)
+timeout = time.time() + args.timeout+5
+print(bcolors.OKBLUE + "Listening for UPnP packets on port {0}".format(args.port) + bcolors.ENDC)
 message = ""
 while receiving:
     try:
@@ -98,8 +103,9 @@ while receiving:
             deviceDict[packet.usn] = packet
     else:
         # Not the right protocol, discard
-        print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
-        print(message)
+        if args.verbosity:
+            print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
+            print(message)
 
 
     if time.time() > timeout:
