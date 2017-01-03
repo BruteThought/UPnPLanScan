@@ -56,7 +56,7 @@ sock.bind(("", args.port))
 print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
 if args.verbosity:
     print(bcolors.HEADER + "[*] Verbosity turned on" + bcolors.ENDC)
-print(bcolors.OKBLUE + "Sending M-SEARCH packet on '" + str(args.ip) + ":" + str(args.port) + "'" + bcolors.ENDC)
+print(bcolors.OKBLUE + "[*] Sending M-SEARCH packet on '" + str(args.ip) + ":" + str(args.port) + "'" + bcolors.ENDC)
 sock.sendto(bytes(MESSAGE, "utf-8"), (args.ip, args.port))
 
 # Reset the socket to receive instead, prepare to get all of the 200/OK packets
@@ -77,7 +77,7 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 # Start listening for responses
 # timeout 5 seconds after the required response time to have a look at devices
 timeout = time.time() + args.timeout+5
-print(bcolors.OKBLUE + "Listening for UPnP packets on port {0}".format(args.port) + bcolors.ENDC)
+print(bcolors.OKBLUE + "[*] Listening for UPnP packets on port {0}".format(args.port) + bcolors.ENDC)
 message = ""
 while receiving:
     try:
@@ -86,7 +86,7 @@ while receiving:
     except socket.timeout as e:
         # If sufficient time has passed, break out of it.
         if time.time() > timeout:
-            print("Recv & MX timeout stopping search")
+            print("[*] Recv & MX timeout stopping search")
             break
 
     sock.settimeout(0)
@@ -109,7 +109,7 @@ while receiving:
 
 
     if time.time() > timeout:
-        print("MX Timeout, stopping search")
+        print("[*] MX Timeout, stopping search")
         break
 
 print(bcolors.HEADER + bcolors.BOLD + "---FINISHED DEVICE SCAN---" + bcolors.ENDC + "\n")
@@ -133,5 +133,5 @@ for key in deviceDict:
             print("") # Newline
     else:
         # If the services were unable to be obtained
-        print(bcolors.FAIL + "Could not obtain services from blank service list" + bcolors.ENDC)
+        print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
         print("")
