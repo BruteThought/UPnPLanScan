@@ -25,4 +25,11 @@ class service:
         for action in self.actionList:
             print(bcolors.OKGREEN + "\t\t└ Action: {0}".format(action.name) + bcolors.ENDC)
             for argument in action.argumentList:
-                print(bcolors.WARNING + "\t\t  {0}\t {1}".format(argument.direction, argument.name) + bcolors.ENDC)
+                if type(argument.relatedStateVariable) is not str:
+                    print(bcolors.WARNING + "\t\t  {:4} {:32} {:10} {}".format(argument.direction,
+                                                                           argument.name,
+                                                                           argument.relatedStateVariable.dataType,
+                                                                           argument.relatedStateVariable.defaultValue) + bcolors.ENDC)
+                else:
+                    print(bcolors.WARNING + "\t  {0}\t {1}".format(argument.direction,
+                                                                       argument.name) + bcolors.ENDC)

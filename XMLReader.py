@@ -9,15 +9,23 @@ from argument import argument
 from variable import variable
 from bcolors import bcolors
 
+# TODO: Somehow pull all of the comments from the xml docs as well
+# TODO: Strip all of the inputs for trailing/leading stuff as well as escape characters.
 
-def get_arguments(argumentList):
+def get_arguments(argumentList, variableDict):
     # TODO: Try/Catch for this section
     argumentArray = []
     XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
     for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
         name = argumentNode.find(XMLNamespace + 'name').text
         direction = argumentNode.find(XMLNamespace + 'direction').text
+        # TODO: Match the relatedStateVariable with the variable listed in the stateVariableTable for info like type
         relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable').text
+        if relatedStateVariable in variableDict:
+            relatedStateVariable = variableDict[relatedStateVariable]
+        else:
+            relatedStateVariable = variable(relatedStateVariable, "?", "?")
+
         argumentArray.append(argument(name, direction, relatedStateVariable))
     return argumentArray
 
@@ -33,7 +41,7 @@ def get_actions(XMLURL):
 
     # If the document could not be obtained
     if XMLDocument is None:
-        print(bcolors.WARNING + "[*] Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
+        print(bcolors.WARNING + "[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping." + bcolors.ENDC)
     else:
         try:
             # Get the root of the structure
@@ -49,6 +57,7 @@ def get_actions(XMLURL):
             actionList = root.find(XMLNamespace + 'actionList')
             stateVariableList = root.find(XMLNamespace + 'serviceStateTable')
 
+            # Loop through the variable state table in order to get info for later references.
             for variableNode in stateVariableList.findall(XMLNamespace + 'stateVariable'):
                 name = variableNode.find(XMLNamespace + 'name').text
                 dataType = variableNode.find(XMLNamespace + 'dataType').text
@@ -59,7 +68,7 @@ def get_actions(XMLURL):
                 name = actionNode.find(XMLNamespace + 'name').text
 
                 # Get the variableArray into a key/value structure, then pass it as an argument
-                argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'))
+                argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'), variableDict)
                 actionArray.append(action(name, argumentList))
 
 
@@ -78,7 +87,7 @@ def get_services(XMLURL):
 
     # If the document could not be obtained
     if XMLDocument is None:
-        print(bcolors.WARNING + "[*] Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
+        print(bcolors.WARNING + "[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping." + bcolors.ENDC)
     else:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
         # TODO: narrow down this exception clause
