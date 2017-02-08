@@ -33,7 +33,7 @@ def get_actions(XMLURL):
 
     # If the document could not be obtained
     if XMLDocument is None:
-        print(bcolors.WARNING + "Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
+        print(bcolors.WARNING + "[*] Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
     else:
         try:
             # Get the root of the structure
@@ -78,7 +78,7 @@ def get_services(XMLURL):
 
     # If the document could not be obtained
     if XMLDocument is None:
-        print(bcolors.WARNING + "Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
+        print(bcolors.WARNING + "[*] Document at " + XMLURL + " could not be obtained. Skipping." + bcolors.ENDC)
     else:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
         # TODO: narrow down this exception clause

@@ -86,7 +86,7 @@ while receiving:
     except socket.timeout as e:
         # If sufficient time has passed, break out of it.
         if time.time() > timeout:
-            print("[*] Recv & MX timeout stopping search")
+            print(bcolors.OKBLUE + "[*] Recv & MX timeout stopping search" + bcolors.ENDC)
             break
 
     sock.settimeout(0)
@@ -105,33 +105,35 @@ while receiving:
         # Not the right protocol, discard
         if args.verbosity:
             print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
-            print(message)
+            # TODO: Check if we should print out the packet if not the correct thing (verbosity...?)
+            # print(message)
 
 
     if time.time() > timeout:
-        print("[*] MX Timeout, stopping search")
+        print(bcolors.OKBLUE + "[*] MX Timeout, stopping search" + bcolors.ENDC)
         break
 
-print(bcolors.HEADER + bcolors.BOLD + "---FINISHED DEVICE SCAN---" + bcolors.ENDC + "\n")
-print(bcolors.HEADER + bcolors.BOLD + "--Devices Discovered: {0}. Scanning for services and actions.--".format(str(len(deviceDict))) + bcolors.ENDC + "\n")
-for key in deviceDict:
-    deviceDict[key].printInfo()
+print(bcolors.HEADER + bcolors.BOLD + "---FINISHED DEVICE SCAN---" + bcolors.ENDC)
+print()
+print(bcolors.BOLD + "Devices Discovered: {0}. Scanning devices for services and actions.".format(str(len(deviceDict))) + bcolors.ENDC)
 
-    #print(bcolors.OKBLUE + bcolors.BOLD + "Spider services: " + deviceDict[key].usn + bcolors.ENDC)
+
+for key in deviceDict:
+    #deviceDict[key].printInfo()
+
+    print("[*] Spidering services of: {} at URL ".format(str(deviceDict[key].usn)))
 
     # Read the root manifest for services, then create a list of them
     deviceDict[key].serviceList = XMLReader.get_services(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
-    print("") # Newline
 
     # For each of the found services, get their actions (and by extension, their variables)
     if deviceDict[key].serviceList is not None:
         for service in deviceDict[key].serviceList:
             service.actionList = XMLReader.get_actions(str(deviceDict[key].baseURL + service.SCPDURL))
-            # Output both the info and the actions of each service.
-            service.printInfo()
-            service.printActions()
-            print("") # Newline
+            if args.verbosity:
+                # Output both the info and the actions of each service.
+                service.printInfo()
+                service.printActions()
     else:
         # If the services were unable to be obtained
         print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
-        print("")
