@@ -122,6 +122,7 @@ for key in deviceDict:
     #deviceDict[key].printInfo()
 
     print("[*] Spidering services of: {} at URL ".format(repr(str(deviceDict[key].usn))))
+    # TODO: at url... what? I think the url was meant to be included here.
 
     # Read the root manifest for services, then create a list of them
     deviceDict[key].serviceList = XMLReader.get_services(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
