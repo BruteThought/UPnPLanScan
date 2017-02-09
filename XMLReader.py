@@ -19,7 +19,6 @@ def get_arguments(argumentList, variableDict):
     for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
         name = argumentNode.find(XMLNamespace + 'name').text
         direction = argumentNode.find(XMLNamespace + 'direction').text
-        # TODO: Match the relatedStateVariable with the variable listed in the stateVariableTable for info like type
         relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable').text
         if relatedStateVariable in variableDict:
             relatedStateVariable = variableDict[relatedStateVariable]
@@ -29,7 +28,6 @@ def get_arguments(argumentList, variableDict):
         argumentArray.append(argument(name, direction, relatedStateVariable))
     return argumentArray
 
-# TODO: Should getting the arguments of an action be a separate function?
 def get_actions(XMLURL):
 
     # Should change everything into objects, THEN pass them around, rather than passing around XML then selectively parsing.
@@ -118,13 +116,14 @@ def get_services(XMLURL):
         except:
             # TODO: this is not printing correctly in some cases, e.g. http://192.168.1.191:40001/ will
             # fuck with the output, not sure why.
-            print(bcolors.FAIL + "Service XML Document at: '{0}' could not be parsed, skipping.".format(XMLURL) + bcolors.ENDC)
+            # UPDATE: The repr() function may have fixed this, keep an eye on it and remove this to-do if it seems to be fixed.
+            print(bcolors.FAIL + "Service XML Document at: '{0}' could not be parsed, skipping.".format(repr(XMLURL)) + bcolors.ENDC)
         return serviceArray
 
 
 def get_xml_document(XMLURL):
     # TODO: if the XML fails, it should immediately be saved in raw form for later use.
-    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful
+    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful, but could be useful for the user.
     attempts = 0
     while attempts < 3:
         attempts += 1

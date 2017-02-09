@@ -105,7 +105,7 @@ while receiving:
         # Not the right protocol, discard
         if args.verbosity:
             print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
-            # TODO: Check if we should print out the packet if not the correct thing (verbosity...?)
+            # TODO: Check if we should print out the packet if not the correct packet type.
             # print(message)
 
 
