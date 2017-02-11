@@ -5,8 +5,10 @@ import codecs
 import re
 import time
 import XMLReader
+import curses
 from bcolors import bcolors
 from device import device
+from curses import wrapper
 
 deviceDict = {}
 receiving = 1
@@ -53,6 +55,41 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # Bind the socket to the port, then send it
 sock.bind(("", args.port))
+
+# Set up the display
+stdscr = curses.initscr()
+# Hide the input and react instantly to character input
+
+curses.noecho()
+curses.cbreak()
+def printTitle():
+    print(" _____ _____     _____ __            _____             ")
+    print("|  |  |  _  |___|  _  |  |   ___ ___|   __|___ ___ ___ ")
+    print("|  |  |   __|   |   __|  |__| .'|   |__   |  _| .'|   |")
+    print("|_____|__|  |_|_|__|  |_____|__,|_|_|_____|___|__,|_|_|\n")
+
+def main(stdscr):
+    stdscr.clear()
+    choice = ""
+    while choice != "q":
+        #printTitle()
+        stdscr.addstr("Hey! You are stuck!\n")
+        stdscr.addstr("[1] Scan for devices.\n")
+        stdscr.addstr("[q] Quit\n")
+        stdscr.refresh()
+
+        choice = input("UPnPLanScan> ")
+        if choice == "1":
+            print("Scanning\n")
+        elif choice == "q":
+            exit()
+        else:
+            print("Invalid selection\n")
+
+wrapper(main)
+print("I got here!")
+
+
 print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
 if args.verbosity:
     print(bcolors.HEADER + "[*] Verbosity turned on" + bcolors.ENDC)
