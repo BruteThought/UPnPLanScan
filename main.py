@@ -6,6 +6,7 @@ import re
 import time
 import XMLReader
 import curses
+from threading import Thread
 from bcolors import bcolors
 from device import device
 from curses import wrapper
@@ -56,12 +57,14 @@ def deviceScan():
     # Bind the socket to the port, then send it
     sock.bind(("", args.port))
 
-    print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
+    #print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
 
     if args.verbosity:
-        print(bcolors.HEADER + "[*] Verbosity turned on" + bcolors.ENDC)
-    print(bcolors.OKBLUE + "[*] Sending M-SEARCH packet on '" + str(args.ip) + ":" + str(
-        args.port) + "'" + bcolors.ENDC)
+        #print(bcolors.HEADER + "[*] Verbosity turned on" + bcolors.ENDC)
+        # TODO: Remove this pointless placeholder
+        temp = 1+1
+    #print(bcolors.OKBLUE + "[*] Sending M-SEARCH packet on '" + str(args.ip) + ":" + str(
+    #    args.port) + "'" + bcolors.ENDC)
     sock.sendto(bytes(MESSAGE, "utf-8"), (args.ip, args.port))
 
     # Reset the socket to receive instead, prepare to get all of the 200/OK packets
@@ -127,7 +130,7 @@ def deviceScan():
     for key in deviceDict:
         # deviceDict[key].printInfo()
 
-        print("[*] Spidering services of: {} at URL ".format(repr(str(deviceDict[key].usn))))
+        #print("[*] Spidering services of: {} at URL ".format(repr(str(deviceDict[key].usn))))
         # TODO: at url... what? I think the url was meant to be included here.
 
         # Read the root manifest for services, then create a list of them
@@ -143,7 +146,9 @@ def deviceScan():
                     service.printActions()
         else:
             # If the services were unable to be obtained
-            print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
+            # print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
+            # TODO: Remove this temp placeholder.
+            temp = 1 + 1
 
 # Set up the display
 stdscr = curses.initscr()
@@ -160,43 +165,63 @@ def printTitle(stdscr):
     stdscr.addstr("|  |  |   __|   |   __|  |__| .'|   |__   |  _| .'|   |\n")
     stdscr.addstr("|_____|__|  |_|_|__|  |_____|__,|_|_|_____|___|__,|_|_|\n")
 
-def main(stdscr):
+
+def printMenu(stdscr):
     stdscr.clear()
-    choice = ""
     printTitle(stdscr)
     stdscr.addstr("[1] Scan for devices.\n")
+    i = 1
+    for key in deviceDict:
+        i += 1
+        stdscr.addstr("[" + str(i) + "]" + str(repr(deviceDict[key].usn)) + "\n")
+        #+ deviceDict[key].usn +
     stdscr.addstr("[q] Quit\n")
     stdscr.refresh()
+
+
+def loadingLoop(stdscr, index, thread):
+    # Offset for title and "default" options.
+    index += 6
+
+    # While the scan is still happening
+    while thread.is_alive():
+        stdscr.addstr(index, 0, "Scanning...")
+        stdscr.refresh()
+        time.sleep(1)
+        stdscr.addstr(index, 0, "Scanning ..")
+        stdscr.refresh()
+        time.sleep(1)
+        stdscr.addstr(index, 0, "Scanning. .")
+        stdscr.refresh()
+        time.sleep(1)
+        stdscr.addstr(index, 0, "Scanning.. ")
+        stdscr.refresh()
+        time.sleep(1)
+        stdscr.addstr(index, 0, "Scanning...")
+        stdscr.refresh()
+        time.sleep(1)
+
+
+def main(stdscr):
+    choice = ""
+    printMenu(stdscr)
+
     while choice != "q":
 
         choice = stdscr.getch()
-
         if choice == ord("1"):
-            # TODO: Change "6" to the value of devices + constant value
-            stdscr.addstr(6,0,"Scanning...")
-            stdscr.refresh()
-            time.sleep(1)
-            stdscr.addstr(6, 0, "Scanning ..")
-            stdscr.refresh()
-            time.sleep(1)
-            stdscr.addstr(6, 0, "Scanning. .")
-            stdscr.refresh()
-            time.sleep(1)
-            stdscr.addstr(6, 0, "Scanning.. ")
-            stdscr.refresh()
-            time.sleep(1)
-            stdscr.addstr(6, 0, "Scanning...")
-            stdscr.refresh()
-            time.sleep(1)
-            stdscr.addstr(6, 0, "Scanning ..")
-            stdscr.refresh()
-            time.sleep(1)
-            stdscr.addstr(6, 0, "Scanning. .")
-            stdscr.refresh()
+            thread = Thread(target=deviceScan, args=())
+            thread.start()
+            loadingLoop(stdscr, len(deviceDict), thread)
+            thread.join()
+            printMenu(stdscr)
+
         elif choice == ord("2"):
             deviceScan()
+
         elif choice == ord("q"):
             exit()
+
         else:
             stdscr.addstr("Invalid selection\n")
             stdscr.refresh()
