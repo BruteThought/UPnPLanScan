@@ -36,8 +36,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2976">
-              <caret line="220" column="64" lean-forward="false" selection-start-line="220" selection-start-column="64" selection-end-line="220" selection-end-column="64" />
+            <state relative-caret-position="300">
+              <caret line="29" column="0" lean-forward="true" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -152,7 +152,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>append</find>
       <find>ge</find>
       <find>getaction</find>
       <find>parsed</find>
@@ -182,6 +181,7 @@
       <find>loading</find>
       <find>could not</find>
       <find>print(</find>
+      <find>int(ch</find>
     </findStrings>
     <replaceStrings>
       <replace>stdscr.addstr</replace>
@@ -785,7 +785,14 @@
       <option name="project" value="LOCAL" />
       <updated>1487231867405</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Starting interaction stage">
+      <created>1487237252558</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1487237252558</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TodoView">
@@ -900,7 +907,8 @@
     <MESSAGE value="Adding curses as output method" />
     <MESSAGE value="Beginning restructure for terminal application." />
     <MESSAGE value="Menu is now in development! Has a loading bar when a scan starts that will stop when scan is finished. New devices are added to the menu, next stage is making it interactive and dealing with over 9 devices (can't press 10 instantly!)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Menu is now in development! Has a loading bar when a scan starts that will stop when scan is finished. New devices are added to the menu, next stage is making it interactive and dealing with over 9 devices (can't press 10 instantly!)" />
+    <MESSAGE value="Starting interaction stage" />
+    <option name="LAST_COMMIT_MESSAGE" value="Starting interaction stage" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1218,8 +1226,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2976">
-          <caret line="220" column="64" lean-forward="false" selection-start-line="220" selection-start-column="64" selection-end-line="220" selection-end-column="64" />
+        <state relative-caret-position="300">
+          <caret line="29" column="0" lean-forward="true" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

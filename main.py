@@ -27,6 +27,7 @@ MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
           "MX:" + str(args.timeout) + "\r\n" \
           "MAN:\"ssdp:discover\"\r\n\r\n"
 
+
 def decodepacket(receivedPacket):
         cache = cleanReg(re.search(r'(?:CACHE-CONTROL: ?)(.*)', receivedPacket))
         date = cleanReg(re.search(r'(?:DATE: ?)(.*)', receivedPacket))
@@ -129,28 +130,30 @@ def deviceScan():
     #print(bcolors.BOLD + "Devices Discovered: {0}. Scanning devices for services and actions.".format(
     #    str(len(deviceDict))) + bcolors.ENDC)
 
-    for key in deviceDict:
-        # deviceDict[key].printInfo()
 
-        #print("[*] Spidering services of: {} at URL ".format(repr(str(deviceDict[key].usn))))
-        # TODO: at url... what? I think the url was meant to be included here.
+def scanServices(device):
 
-        # Read the root manifest for services, then create a list of them
-        deviceDict[key].serviceList = XMLReader.get_services(str(deviceDict[key].baseURL + deviceDict[key].rootXML))
+    # deviceDict[key].printInfo()
 
-        # For each of the found services, get their actions (and by extension, their variables)
-        if deviceDict[key].serviceList is not None:
-            for service in deviceDict[key].serviceList:
-                service.actionList = XMLReader.get_actions(str(deviceDict[key].baseURL + service.SCPDURL))
-                if args.verbosity:
-                    # Output both the info and the actions of each service.
-                    service.printInfo()
-                    service.printActions()
-        else:
-            # If the services were unable to be obtained
-            # print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
-            # TODO: Remove this temp placeholder.
-            temp = 1 + 1
+    #print("[*] Spidering services of: {} at URL ".format(repr(str(deviceDict[key].usn))))
+    # TODO: at url... what? I think the url was meant to be included here.
+
+    # Read the root manifest for services, then create a list of them
+    device.serviceList = XMLReader.get_services(str(device.baseURL + device.rootXML))
+
+    # For each of the found services, get their actions (and by extension, their variables)
+    if device.serviceList is not None:
+        for service in device.serviceList:
+            service.actionList = XMLReader.get_actions(str(device.baseURL + service.SCPDURL))
+            if args.verbosity:
+                # Output both the info and the actions of each service.
+                service.printInfo()
+                service.printActions()
+    else:
+        # If the services were unable to be obtained
+        # print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
+        # TODO: Remove this temp placeholder.
+        temp = 1 + 1
 
 # Set up the display
 stdscr = curses.initscr()
@@ -171,13 +174,20 @@ menuDevices = {}
 def printMenu(stdscr):
     stdscr.clear()
     printTitle(stdscr)
-    stdscr.addstr("[1] Scan for devices.\n")
+    stdscr.addstr("[1] Scan for devices\n")
     i = 1
     for key in deviceDict:
         i += 1
         menuDevices[i] = deviceDict[key]
         stdscr.addstr("[" + str(i) + "]" + str(repr(deviceDict[key].usn)) + "\n")
     stdscr.addstr("[q] Quit\n")
+    stdscr.refresh()
+
+def printSubMenu(stdscr):
+    stdscr.clear()
+    printTitle(stdscr)
+    stdscr.addstr("[1] Scan Services \n")
+    stdscr.addstr("[2] Back \n")
     stdscr.refresh()
 
 
@@ -189,26 +199,38 @@ def loadingLoop(stdscr, index, thread):
     while thread.is_alive():
         stdscr.addstr(index, 0, "Scanning...")
         stdscr.refresh()
-        time.sleep(1)
+        time.sleep(0.5)
         stdscr.addstr(index, 0, "Scanning ..")
         stdscr.refresh()
-        time.sleep(1)
+        time.sleep(0.5)
         stdscr.addstr(index, 0, "Scanning. .")
         stdscr.refresh()
-        time.sleep(1)
+        time.sleep(0.5)
         stdscr.addstr(index, 0, "Scanning.. ")
         stdscr.refresh()
-        time.sleep(1)
+        time.sleep(0.5)
         stdscr.addstr(index, 0, "Scanning...")
         stdscr.refresh()
-        time.sleep(1)
+        time.sleep(0.5)
 
+
+def subMenu(stdscr, device):
+    printSubMenu(stdscr)
+    while True:
+        choice = stdscr.getch()
+        # Scan the services of the device
+        if choice == ord("1"):
+            scanServices(device)
+
+        # Go back to the main menu
+        if choice == ord("2"):
+            printMenu(stdscr)
+            return
 
 def main(stdscr):
-    choice = ""
     printMenu(stdscr)
 
-    while choice != "q":
+    while True:
 
         choice = stdscr.getch()
         if choice == ord("1"):
@@ -218,12 +240,14 @@ def main(stdscr):
             thread.join()
             printMenu(stdscr)
 
-        # Get the choice, change it from ord to chr then to int.
-        elif int(chr(choice)) in menuDevices:
-            print("OBOI")
-
         elif choice == ord("q"):
             exit()
+
+        # Get the choice, change it from ord to chr then to int.
+        elif chr(choice).isdigit():
+            index = int(chr(choice))
+            if(index in menuDevices):
+                subMenu(stdscr, menuDevices[index])
 
         else:
             stdscr.addstr("Invalid selection\n")
