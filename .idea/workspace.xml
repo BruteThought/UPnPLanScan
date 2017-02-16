@@ -36,8 +36,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="29" column="0" lean-forward="true" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+            <state relative-caret-position="3066">
+              <caret line="237" column="0" lean-forward="false" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -152,8 +152,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ge</find>
-      <find>getaction</find>
       <find>parsed</find>
       <find>could not be parsed</find>
       <find>actions</find>
@@ -182,6 +180,8 @@
       <find>could not</find>
       <find>print(</find>
       <find>int(ch</find>
+      <find>args.verb</find>
+      <find>offse</find>
     </findStrings>
     <replaceStrings>
       <replace>stdscr.addstr</replace>
@@ -792,7 +792,14 @@
       <option name="project" value="LOCAL" />
       <updated>1487237252558</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Added submenu, need to change printouts to work with curse">
+      <created>1487239185752</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1487239185752</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TodoView">
@@ -908,7 +915,8 @@
     <MESSAGE value="Beginning restructure for terminal application." />
     <MESSAGE value="Menu is now in development! Has a loading bar when a scan starts that will stop when scan is finished. New devices are added to the menu, next stage is making it interactive and dealing with over 9 devices (can't press 10 instantly!)" />
     <MESSAGE value="Starting interaction stage" />
-    <option name="LAST_COMMIT_MESSAGE" value="Starting interaction stage" />
+    <MESSAGE value="Added submenu, need to change printouts to work with curse" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added submenu, need to change printouts to work with curse" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1226,8 +1234,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="29" column="0" lean-forward="true" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+        <state relative-caret-position="3066">
+          <caret line="237" column="0" lean-forward="false" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

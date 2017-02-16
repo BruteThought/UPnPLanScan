@@ -59,20 +59,10 @@ def deviceScan():
 
     # Bind the socket to the port, then send it
     sock.bind(("", args.port))
-
-    #print(bcolors.HEADER + bcolors.BOLD + "---STARTING ACTIVE (M-SEARCH) SCAN---" + bcolors.ENDC)
-
-    if args.verbosity:
-        #print(bcolors.HEADER + "[*] Verbosity turned on" + bcolors.ENDC)
-        # TODO: Remove this pointless placeholder
-        temp = 1+1
-    #print(bcolors.OKBLUE + "[*] Sending M-SEARCH packet on '" + str(args.ip) + ":" + str(
-    #    args.port) + "'" + bcolors.ENDC)
     sock.sendto(bytes(MESSAGE, "utf-8"), (args.ip, args.port))
 
     # Reset the socket to receive instead, prepare to get all of the 200/OK packets
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-
     sock.bind(("", args.port))
 
     # 4sl = Four letter string signed long
@@ -88,7 +78,6 @@ def deviceScan():
     # Start listening for responses
     # timeout 5 seconds after the required response time to have a look at devices
     timeout = time.time() + args.timeout + 5
-    #print(bcolors.OKBLUE + "[*] Listening for UPnP packets on port {0}".format(args.port) + bcolors.ENDC)
     message = ""
     while receiving:
         try:
@@ -97,7 +86,6 @@ def deviceScan():
         except socket.timeout as e:
             # If sufficient time has passed, break out of it.
             if time.time() > timeout:
-                #print(bcolors.OKBLUE + "[*] Recv & MX timeout stopping search" + bcolors.ENDC)
                 break
 
         sock.settimeout(0)
@@ -110,25 +98,11 @@ def deviceScan():
 
             # Check the USN and put it into an array if there are no matches.
             if packet.usn not in deviceDict:
-                #print("Found Device: " + str(packet.usn))
                 deviceDict[packet.usn] = packet
-        else:
-            # Not the right protocol, discard
-            if args.verbosity:
-                # TODO: Get rid of this useless placeholder
-                randomVar = 1+1
-                #print(bcolors.WARNING + "Packet not correct protocol, Discarded" + bcolors.ENDC)
-                # TODO: Check if we should print out the packet if not the correct packet type.
-                # print(message)
+            # TODO: Should probably do something if I don't get the right package
 
         if time.time() > timeout:
-            #print(bcolors.OKBLUE + "[*] MX Timeout, stopping search" + bcolors.ENDC)
             break
-
-    #print(bcolors.HEADER + bcolors.BOLD + "---FINISHED DEVICE SCAN---" + bcolors.ENDC)
-    #print()
-    #print(bcolors.BOLD + "Devices Discovered: {0}. Scanning devices for services and actions.".format(
-    #    str(len(deviceDict))) + bcolors.ENDC)
 
 
 def scanServices(device):
@@ -151,17 +125,18 @@ def scanServices(device):
                 service.printActions()
     else:
         # If the services were unable to be obtained
-        # print(bcolors.FAIL + "[*] Could not obtain services from blank service list" + bcolors.ENDC)
-        # TODO: Remove this temp placeholder.
-        temp = 1 + 1
+        stdscr.addstr("[*] Could not obtain services from blank service list")
 
 # Set up the display
 stdscr = curses.initscr()
 
 # Curses config
-
 curses.noecho()
 curses.cbreak()
+
+curses.start_color()
+curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
+
 
 def printTitle(stdscr):
 
@@ -174,6 +149,8 @@ menuDevices = {}
 def printMenu(stdscr):
     stdscr.clear()
     printTitle(stdscr)
+    if args.verbosity:
+        stdscr.addstr("[*] Verbosity switch is on\n\n", curses.color_pair(1))
     stdscr.addstr("[1] Scan for devices\n")
     i = 1
     for key in deviceDict:
@@ -194,7 +171,11 @@ def printSubMenu(stdscr):
 def loadingLoop(stdscr, index, thread):
     # Offset for title and "default" options.
     index += 6
+    if args.verbosity:
+        index += 2
 
+    stdscr.addstr(index, 0, "Starting scan through IP: " + str(args.ip) + ":" + str(args.port) + "\n")
+    index += 1
     # While the scan is still happening
     while thread.is_alive():
         stdscr.addstr(index, 0, "Scanning...")
@@ -238,6 +219,7 @@ def main(stdscr):
             thread.start()
             loadingLoop(stdscr, len(deviceDict), thread)
             thread.join()
+
             printMenu(stdscr)
 
         elif choice == ord("q"):
@@ -246,7 +228,7 @@ def main(stdscr):
         # Get the choice, change it from ord to chr then to int.
         elif chr(choice).isdigit():
             index = int(chr(choice))
-            if(index in menuDevices):
+            if index in menuDevices:
                 subMenu(stdscr, menuDevices[index])
 
         else:
