@@ -41,11 +41,13 @@ def decodepacket(receivedPacket):
         currentDevice = device(cache, date, location, opt, nls, server, userAgent, st, usn)
         return currentDevice
 
+
 def cleanReg(result):
     if result:
         return result.group(1)
     else:
         return ""
+
 
 def deviceScan():
     # Set up the UDP port, bind it, then send the M-SEARCH packet.
@@ -165,7 +167,7 @@ def printTitle(stdscr):
     stdscr.addstr("|  |  |   __|   |   __|  |__| .'|   |__   |  _| .'|   |\n")
     stdscr.addstr("|_____|__|  |_|_|__|  |_____|__,|_|_|_____|___|__,|_|_|\n")
 
-
+menuDevices = {}
 def printMenu(stdscr):
     stdscr.clear()
     printTitle(stdscr)
@@ -173,8 +175,8 @@ def printMenu(stdscr):
     i = 1
     for key in deviceDict:
         i += 1
+        menuDevices[i] = deviceDict[key]
         stdscr.addstr("[" + str(i) + "]" + str(repr(deviceDict[key].usn)) + "\n")
-        #+ deviceDict[key].usn +
     stdscr.addstr("[q] Quit\n")
     stdscr.refresh()
 
@@ -216,8 +218,9 @@ def main(stdscr):
             thread.join()
             printMenu(stdscr)
 
-        elif choice == ord("2"):
-            deviceScan()
+        # Get the choice, change it from ord to chr then to int.
+        elif int(chr(choice)) in menuDevices:
+            print("OBOI")
 
         elif choice == ord("q"):
             exit()
