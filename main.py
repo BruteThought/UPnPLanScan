@@ -177,6 +177,32 @@ def loadingLoop(stdscr, index, thread):
         stdscr.refresh()
         time.sleep(0.5)
 
+def printServiceMenu(stdscr, device):
+    index = 0
+    stdscr.clear()
+    printTitle(stdscr)
+    # TODO Need to sort out what happens if we get over 9 options
+    for service in device.serviceList:
+        index += 1
+        stdscr.addstr("[{0}] {1} ({2} Actions)\n".format(index, repr(str(service.id)), len(service.actionList)))
+    stdscr.addstr("[{0}] Back".format(str(index)))
+    stdscr.refresh()
+
+
+def serviceMenu(stdscr, device):
+    printServiceMenu(stdscr, device)
+
+    while True:
+        index = 0
+        choice = stdscr.getch()
+        for service in device.serviceList:
+            index += 1
+            if choice == ord(str(index)):
+                service.printInfo(stdscr)
+        index += 1
+        if choice == ord(str(index)):
+            return 
+
 
 def printSubMenu(stdscr, device):
     index = 1
@@ -187,7 +213,7 @@ def printSubMenu(stdscr, device):
     stdscr.addstr("[{0}] Print Device Info\n".format(index))
     if device.serviceList:
         index += 1
-        stdscr.addstr("[{0}] Print Services\n".format(index))
+        stdscr.addstr("[{0}] View Services ({1} found)\n".format(index, str(len(device.serviceList))))
     index += 1
     stdscr.addstr("[{0}] Back \n".format(index))
     stdscr.refresh()
@@ -197,7 +223,6 @@ def subMenu(stdscr, device):
     printSubMenu(stdscr, device)
 
     while True:
-        #printSubMenu(stdscr, device)
         index = 1
         choice = stdscr.getch()
 
@@ -212,11 +237,11 @@ def subMenu(stdscr, device):
             device.printInfo(stdscr)
             stdscr.refresh()
 
-        # Print the service Lists
+        # Go to the service menu
         if device.serviceList:
             index +=1
             if choice == ord(str(index)):
-                print("whoops")
+               serviceMenu(stdscr, device)
 
         # Go back to the main menu
         index +=1

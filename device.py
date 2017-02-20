@@ -32,3 +32,7 @@ class device:
         stdscr.addstr("User Agent: \t{0}\n".format(repr(self.userAgent)))
         stdscr.addstr("ST: \t\t{0}\n".format(repr(self.st)))
         stdscr.refresh()
+
+    def printServices(self, stdscr):
+        for service in self.serviceList:
+            stdscr.addstr("Service ID:\t {0}\n".format(repr(str(service.id))))

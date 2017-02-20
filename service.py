@@ -15,11 +15,11 @@ class service:
         self.riskRanking = 0
 
     def printInfo(self, stdscr):
-        stdscr.addstr("\tserviceType:\t" + self.type)
-        stdscr.addstr("\tserviceId:\t" + self.id)
-        stdscr.addstr("\tcontrolURL:\t" + self.controlURL)
-        stdscr.addstr("\teventSubURL:\t" + self.eventSubURL)
-        stdscr.addstr("\tSCPDURL:\t" + "/" + self.SCPDURL)
+        stdscr.addstr("serviceType:\t{0}\n".format(repr(str(self.type))))
+        stdscr.addstr("serviceId:\t{0}\n".format(repr(str(self.id))))
+        stdscr.addstr("controlURL:\t{0}\n".format(repr(str(self.controlURL))))
+        stdscr.addstr("eventSubURL:\t{0}\n".format(repr(str(self.eventSubURL))))
+        stdscr.addstr("SCPDURL:\t{0}\n".format(repr(str("/" + self.SCPDURL))))
         stdscr.refresh()
 
     def printActions(self):
