@@ -21,13 +21,14 @@ class device:
         self.usn = usn
         self.serviceList = []
 
-    def printInfo(self):
-        print(bcolors.BOLD + "USN: \t\t" + self.usn + bcolors.ENDC)
-        print("Cache: \t\t" + self.cache)
-        print("Date: \t\t" + self.date)
-        print("Location: \t" + self.baseURL + self.rootXML)
-        print("Opt: \t\t" + self.opt)
-        print("NLS: \t\t" + self.nls)
-        print("Server: \t" + self.server)
-        print("User Agent: \t" + self.userAgent)
-        print("ST: \t\t" + self.st)
+    def printInfo(self, stdscr):
+        stdscr.addstr("USN: \t\t{0}\n".format(repr(self.usn)))
+        stdscr.addstr("Cache: \t\t{0}\n".format(repr(self.cache)))
+        stdscr.addstr("Date: \t\t{0}\n".format(repr(self.date)))
+        stdscr.addstr("Location: \t{0}\n".format(repr(self.baseURL + self.rootXML)))
+        stdscr.addstr("Opt: \t\t{0}\n".format(repr(self.opt)))
+        stdscr.addstr("NLS: \t\t{0}\n".format(repr(self.nls)))
+        stdscr.addstr("Server: \t{0}\n".format(repr(self.server)))
+        stdscr.addstr("User Agent: \t{0}\n".format(repr(self.userAgent)))
+        stdscr.addstr("ST: \t\t{0}\n".format(repr(self.st)))
+        stdscr.refresh()

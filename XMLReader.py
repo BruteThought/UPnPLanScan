@@ -8,6 +8,7 @@ from action import action
 from argument import argument
 from variable import variable
 from bcolors import bcolors
+import curses
 
 # TODO: Somehow pull all of the comments from the xml docs as well
 # TODO: Strip all of the inputs for trailing/leading stuff as well as escape characters.
@@ -28,9 +29,11 @@ def get_arguments(argumentList, variableDict):
         argumentArray.append(argument(name, direction, relatedStateVariable))
     return argumentArray
 
-def get_actions(XMLURL):
+
+def get_actions(stdscr, device, service):
 
     # Should change everything into objects, THEN pass them around, rather than passing around XML then selectively parsing.
+    XMLURL = str(device.baseURL + service.SCPDURL)
 
     actionArray = []
     variableDict = {}
@@ -39,53 +42,61 @@ def get_actions(XMLURL):
 
     # If the document could not be obtained
     if XMLDocument is None:
-        print(bcolors.WARNING + "[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping." + bcolors.ENDC)
+        stdscr.addstr("[*] Document at {0} could not be obtained. Skipping.\n" + bcolors.ENDC.format(repr(XMLURL)), curses.color_pair(2))
     else:
-        try:
-            # Get the root of the structure
-            root = ET.fromstring(XMLDocument)
+    #try:
+        # Get the root of the structure
+        root = ET.fromstring(XMLDocument)
 
-            # Get the namespace of the device, set to blank if none
-            # TODO: Check if Namespace is required for actions
-            XMLNamespace = re.match('\{.*\}', root.tag).group(0)
-            if XMLNamespace is None:
-                print(bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + bcolors.ENDC)
-                XMLNamespace = ""
+        # Get the namespace of the device, set to blank if none
+        # TODO: Check if Namespace is required for actions
+        XMLNamespace = re.match('\{.*\}', root.tag).group(0)
+        if XMLNamespace is None:
+            stdscr.addstr("XMLNamespace could not be found, defaulting to blank\n", curses.color_pair(2))
+            stdscr.refresh()
+            XMLNamespace = ""
 
-            actionList = root.find(XMLNamespace + 'actionList')
-            stateVariableList = root.find(XMLNamespace + 'serviceStateTable')
+        actionList = root.find(XMLNamespace + 'actionList')
+        stateVariableList = root.find(XMLNamespace + 'serviceStateTable')
 
-            # Loop through the variable state table in order to get info for later references.
-            for variableNode in stateVariableList.findall(XMLNamespace + 'stateVariable'):
-                name = variableNode.find(XMLNamespace + 'name').text
-                dataType = variableNode.find(XMLNamespace + 'dataType').text
-                defaultValue = variableNode.find(XMLNamespace + 'defaultValue').text
-                variableDict[name] = variable(name, dataType, defaultValue)
+        # Loop through the variable state table in order to get info for later references.
+        for variableNode in stateVariableList.findall(XMLNamespace + 'stateVariable'):
+            name = variableNode.find(XMLNamespace + 'name')
 
-            for actionNode in actionList.findall(XMLNamespace + 'action'):
-                name = actionNode.find(XMLNamespace + 'name').text
+            data_type = variableNode.find(XMLNamespace + 'dataType')
+            default_value = variableNode.find(XMLNamespace + 'defaultValue')
+            if name:
+                name = name.text
+            if data_type:
+                data_type = data_type.text
+            if default_value:
+                default_value = default_value.text
+            variableDict[name] = variable(name, data_type, default_value)
 
-                # Get the variableArray into a key/value structure, then pass it as an argument
-                argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'), variableDict)
-                actionArray.append(action(name, argumentList))
+        for actionNode in actionList.findall(XMLNamespace + 'action'):
+            name = actionNode.find(XMLNamespace + 'name').text
 
-
-        except:
-            # TODO: need to have a try catch for corrupted/non XML files at the provided location.
-            # TODO: narrow down this exception clause
-            print(bcolors.FAIL + "Actions XML Document at: '{0}' could not be parsed, skipping.".format(XMLURL) + bcolors.ENDC)
+            # Get the variableArray into a key/value structure, then pass it as an argument
+            argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'), variableDict)
+            actionArray.append(action(name, argumentList))
+    #except:
+        # TODO: need to have a try catch for corrupted/non XML files at the provided location.
+        # TODO: narrow down this exception clause
+        #stdscr.addstr("Actions XML Document at: '{0}' could not be parsed, skipping.\n".format(XMLURL), curses.color_pair(2))
+        #stdscr.refresh()
         return actionArray
 
 
-def get_services(XMLURL):
+def get_services(stdscr, device):
     serviceArray = []
-
+    XMLURL = str(device.baseURL + device.rootXML)
     #print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
     XMLDocument = get_xml_document(XMLURL)
 
     # If the document could not be obtained
     if XMLDocument is None:
-        print(bcolors.WARNING + "[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping." + bcolors.ENDC)
+        stdscr.add("[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping.\n", curses.color_pair(2))
+        stdscr.refresh()
     else:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
         # TODO: narrow down this exception clause
@@ -109,15 +120,11 @@ def get_services(XMLURL):
                 serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
                 copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
                 eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
-                # Service control Protocol Document URL
                 SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
 
                 serviceArray.append(service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
         except:
-            # TODO: this is not printing correctly in some cases, e.g. http://192.168.1.191:40001/ will
-            # fuck with the output, not sure why.
-            # UPDATE: The repr() function may have fixed this, keep an eye on it and remove this to-do if it seems to be fixed.
-            print(bcolors.FAIL + "Service XML Document at: '{0}' could not be parsed, skipping.".format(repr(XMLURL)) + bcolors.ENDC)
+            stdscr.add("[*] Document at: '{0}' could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
         return serviceArray
 
 

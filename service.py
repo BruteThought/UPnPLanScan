@@ -14,12 +14,13 @@ class service:
         self.actionList = []
         self.riskRanking = 0
 
-    def printInfo(self):
-        print("\tserviceType:\t" + self.type)
-        print("\tserviceId:\t" + self.id)
-        print("\tcontrolURL:\t" + self.controlURL)
-        print("\teventSubURL:\t" + self.eventSubURL)
-        print("\tSCPDURL:\t" + "/" + self.SCPDURL)
+    def printInfo(self, stdscr):
+        stdscr.addstr("\tserviceType:\t" + self.type)
+        stdscr.addstr("\tserviceId:\t" + self.id)
+        stdscr.addstr("\tcontrolURL:\t" + self.controlURL)
+        stdscr.addstr("\teventSubURL:\t" + self.eventSubURL)
+        stdscr.addstr("\tSCPDURL:\t" + "/" + self.SCPDURL)
+        stdscr.refresh()
 
     def printActions(self):
         for action in self.actionList:

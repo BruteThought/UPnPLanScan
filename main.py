@@ -12,6 +12,7 @@ from device import device
 from curses import wrapper
 
 deviceDict = {}
+menuDevices = {}
 receiving = 1
 
 parser = argparse.ArgumentParser(description="A UPnP scanning, enumerating and fuzzing framework.")
@@ -105,37 +106,26 @@ def deviceScan():
             break
 
 
-def scanServices(device):
+def scanServices(stdscr, device):
 
     # deviceDict[key].printInfo()
-
-    #print("[*] Spidering services of: {} at URL ".format(repr(str(deviceDict[key].usn))))
     # TODO: at url... what? I think the url was meant to be included here.
 
     # Read the root manifest for services, then create a list of them
-    device.serviceList = XMLReader.get_services(str(device.baseURL + device.rootXML))
+    device.serviceList = XMLReader.get_services(stdscr, device)
 
     # For each of the found services, get their actions (and by extension, their variables)
     if device.serviceList is not None:
         for service in device.serviceList:
-            service.actionList = XMLReader.get_actions(str(device.baseURL + service.SCPDURL))
-            if args.verbosity:
+            service.actionList = XMLReader.get_actions(stdscr, device, service)
+            #if args.verbosity:
                 # Output both the info and the actions of each service.
-                service.printInfo()
-                service.printActions()
+             #   service.printInfo()
+              #  service.printActions()
     else:
         # If the services were unable to be obtained
         stdscr.addstr("[*] Could not obtain services from blank service list")
-
-# Set up the display
-stdscr = curses.initscr()
-
-# Curses config
-curses.noecho()
-curses.cbreak()
-
-curses.start_color()
-curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
+    return device
 
 
 def printTitle(stdscr):
@@ -145,7 +135,7 @@ def printTitle(stdscr):
     stdscr.addstr("|  |  |   __|   |   __|  |__| .'|   |__   |  _| .'|   |\n")
     stdscr.addstr("|_____|__|  |_|_|__|  |_____|__,|_|_|_____|___|__,|_|_|\n")
 
-menuDevices = {}
+
 def printMenu(stdscr):
     stdscr.clear()
     printTitle(stdscr)
@@ -158,13 +148,6 @@ def printMenu(stdscr):
         menuDevices[i] = deviceDict[key]
         stdscr.addstr("[" + str(i) + "]" + str(repr(deviceDict[key].usn)) + "\n")
     stdscr.addstr("[q] Quit\n")
-    stdscr.refresh()
-
-def printSubMenu(stdscr):
-    stdscr.clear()
-    printTitle(stdscr)
-    stdscr.addstr("[1] Scan Services \n")
-    stdscr.addstr("[2] Back \n")
     stdscr.refresh()
 
 
@@ -195,20 +178,56 @@ def loadingLoop(stdscr, index, thread):
         time.sleep(0.5)
 
 
+def printSubMenu(stdscr, device):
+    index = 1
+    stdscr.clear()
+    printTitle(stdscr)
+    stdscr.addstr("[{0}] Scan Services ({1})\n".format(index, str(repr(device.baseURL.strip() + device.rootXML.strip()))))
+    index += 1
+    stdscr.addstr("[{0}] Print Device Info\n".format(index))
+    if device.serviceList:
+        index += 1
+        stdscr.addstr("[{0}] Print Services\n".format(index))
+    index += 1
+    stdscr.addstr("[{0}] Back \n".format(index))
+    stdscr.refresh()
+
+
 def subMenu(stdscr, device):
-    printSubMenu(stdscr)
+    printSubMenu(stdscr, device)
+
     while True:
+        #printSubMenu(stdscr, device)
+        index = 1
         choice = stdscr.getch()
+
         # Scan the services of the device
-        if choice == ord("1"):
-            scanServices(device)
+        if choice == ord(str(index)):
+            device = scanServices(stdscr, device)
+            printSubMenu(stdscr, device)
+
+        # Print the device info
+        index += 1
+        if choice == ord(str(index)):
+            device.printInfo(stdscr)
+            stdscr.refresh()
+
+        # Print the service Lists
+        if device.serviceList:
+            index +=1
+            if choice == ord(str(index)):
+                print("whoops")
 
         # Go back to the main menu
-        if choice == ord("2"):
+        index +=1
+        if choice == ord(str(index)):
             printMenu(stdscr)
             return
 
+
 def main(stdscr):
+    # Set up the display
+
     printMenu(stdscr)
 
     while True:
@@ -234,6 +253,15 @@ def main(stdscr):
         else:
             stdscr.addstr("Invalid selection\n")
             stdscr.refresh()
+
+# Curses config
+stdscr = curses.initscr()
+curses.noecho()
+curses.cbreak()
+
+curses.start_color()
+curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
+curses.init_pair(2, curses.COLOR_RED, curses.COLOR_WHITE)
 
 wrapper(main)
 
