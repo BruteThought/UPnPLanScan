@@ -3,10 +3,10 @@ import urllib.request
 import urllib.error
 import xml.etree.ElementTree as elementTree
 from service import Service
-from action import action
-from argument import argument
-from variable import variable
-from bcolors import bcolors
+from action import Action
+from argument import Argument
+from variable import Variable
+from bcolors import Bcolors
 import curses
 
 # TODO: Somehow pull all of the comments from the xml docs as well
@@ -24,9 +24,9 @@ def get_arguments(argumentList, variableDict):
         if relatedStateVariable in variableDict:
             relatedStateVariable = variableDict[relatedStateVariable]
         else:
-            relatedStateVariable = variable(relatedStateVariable, "?", "?")
+            relatedStateVariable = Variable(relatedStateVariable, "?", "?")
 
-        argumentArray.append(argument(name, direction, relatedStateVariable))
+        argumentArray.append(Argument(name, direction, relatedStateVariable))
     return argumentArray
 
 
@@ -42,7 +42,7 @@ def get_actions(stdscr, device, service):
 
     # If the document could not be obtained
     if XMLDocument is None:
-        stdscr.addstr("[*] Document at {0} could not be obtained. Skipping.\n" + bcolors.ENDC.format(repr(XMLURL)), curses.color_pair(2))
+        stdscr.addstr("[*] Document at {0} could not be obtained. Skipping.\n" + Bcolors.ENDC.format(repr(XMLURL)), curses.color_pair(2))
     else:
         # Get the root of the structure
         root = elementTree.fromstring(XMLDocument)
@@ -70,14 +70,14 @@ def get_actions(stdscr, device, service):
                 data_type = data_type.text
             if default_value:
                 default_value = default_value.text
-            variableDict[name] = variable(name, data_type, default_value)
+            variableDict[name] = Variable(name, data_type, default_value)
 
         for actionNode in actionList.findall(XMLNamespace + 'action'):
             name = actionNode.find(XMLNamespace + 'name').text
 
             # Get the variableArray into a key/value structure, then pass it as an argument
             argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'), variableDict)
-            actionArray.append(action(name, argumentList))
+            actionArray.append(Action(name, argumentList))
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
         # TODO: narrow down this exception clause
         # stdscr.addstr("Actions XML Document at: '{0}' could not be parsed, skipping.\n".format(XMLURL), curses.color_pair(2))
@@ -105,7 +105,7 @@ def get_services(stdscr, device):
         # Get the namespace of the device, set to blank if none
         XMLNamespace = re.match('\{.*\}', root.tag).group(0)
         if XMLNamespace is None:
-            print(bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + bcolors.ENDC)
+            print(Bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + Bcolors.ENDC)
             XMLNamespace = ""
 
         # Get the device node to get the service info.
@@ -136,14 +136,14 @@ def get_xml_document(XMLURL):
 
         # TODO: have to properly validate whether or not it is a valid URL!
         if XMLURL == "":
-            print(bcolors.FAIL + "No XML location given! Skipping." + bcolors.ENDC)
+            print(Bcolors.FAIL + "No XML location given! Skipping." + Bcolors.ENDC)
             break
         try:
             XMLDocument = urllib.request.urlopen(XMLURL).read()
             return XMLDocument
         except urllib.error.URLError as e:
             # If the document could not be obtained
-            print(bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + bcolors.ENDC)
+            print(Bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + Bcolors.ENDC)
         except ValueError as e:
-            print(bcolors.FAIL + "{0}".format(e) + bcolors.ENDC)
+            print(Bcolors.FAIL + "{0}".format(e) + Bcolors.ENDC)
     return None
