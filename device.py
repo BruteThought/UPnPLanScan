@@ -1,9 +1,7 @@
 from urllib.parse import urlparse
-from bcolors import bcolors
 
 
-# noinspection PyPep8Naming
-class device:
+class Device:
     def __init__(self, cache, date, location, opt, nls, server, userAgent, st, usn):
         self.cache = cache
         self.date = date
@@ -26,6 +24,7 @@ class device:
         stdscr.addstr("Cache: \t\t{0}\n".format(repr(self.cache)))
         stdscr.addstr("Date: \t\t{0}\n".format(repr(self.date)))
         stdscr.addstr("Location: \t{0}\n".format(repr(self.baseURL + self.rootXML)))
+        stdscr.addstr("Base: \t{0}\n".format(repr(self.baseURL)))
         stdscr.addstr("Opt: \t\t{0}\n".format(repr(self.opt)))
         stdscr.addstr("NLS: \t\t{0}\n".format(repr(self.nls)))
         stdscr.addstr("Server: \t{0}\n".format(repr(self.server)))

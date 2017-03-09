@@ -7,9 +7,8 @@ import time
 import XMLReader
 import curses
 from threading import Thread
-from bcolors import bcolors
-from device import device
 from curses import wrapper
+from device import Device
 
 deviceDict = {}
 menuDevices = {}
@@ -23,7 +22,7 @@ parser.add_argument("-p", "--port", type=int, default=1900, help="the port for s
 args = parser.parse_args()
 
 MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
-          "HOST:"+ str(args.ip)+ ":" + str(args.port) + "\r\n" \
+          "HOST:" + str(args.ip) + ":" + str(args.port) + "\r\n" \
           "ST:upnp:rootdevice\r\n" \
           "MX:" + str(args.timeout) + "\r\n" \
           "MAN:\"ssdp:discover\"\r\n\r\n"
@@ -40,7 +39,7 @@ def decodepacket(receivedPacket):
         st = cleanReg(re.search(r'(?:ST: ?)(.*)', receivedPacket))
         usn = cleanReg(re.search(r'(?:USN: ?)(.*)', receivedPacket))
 
-        currentDevice = device(cache, date, location, opt, nls, server, userAgent, st, usn)
+        currentDevice = Device(cache, date, location, opt, nls, server, userAgent, st, usn)
         return currentDevice
 
 
@@ -84,7 +83,7 @@ def deviceScan():
         try:
             sock.settimeout(5.0)
             message = str(sock.recv(10240), 'utf-8')
-        except socket.timeout as e:
+        except socket.timeout:
             # If sufficient time has passed, break out of it.
             if time.time() > timeout:
                 break
@@ -107,7 +106,6 @@ def deviceScan():
 
 
 def scanServices(stdscr, device):
-
     # deviceDict[key].printInfo()
     # TODO: at url... what? I think the url was meant to be included here.
 
@@ -118,10 +116,6 @@ def scanServices(stdscr, device):
     if device.serviceList is not None:
         for service in device.serviceList:
             service.actionList = XMLReader.get_actions(stdscr, device, service)
-            #if args.verbosity:
-                # Output both the info and the actions of each service.
-             #   service.printInfo()
-              #  service.printActions()
     else:
         # If the services were unable to be obtained
         stdscr.addstr("[*] Could not obtain services from blank service list")
@@ -177,6 +171,7 @@ def loadingLoop(stdscr, index, thread):
         stdscr.refresh()
         time.sleep(0.5)
 
+
 def printServiceMenu(stdscr, device):
     index = 0
     stdscr.clear()
@@ -185,7 +180,8 @@ def printServiceMenu(stdscr, device):
     for service in device.serviceList:
         index += 1
         stdscr.addstr("[{0}] {1} ({2} Actions)\n".format(index, repr(str(service.id)), len(service.actionList)))
-    stdscr.addstr("[{0}] Back".format(str(index)))
+    index += 1
+    stdscr.addstr("[{0}] Back\n".format(str(index)))
     stdscr.refresh()
 
 
@@ -198,10 +194,13 @@ def serviceMenu(stdscr, device):
         for service in device.serviceList:
             index += 1
             if choice == ord(str(index)):
+                # TODO: should this printInfo be included or not? Seperate it out into a different menu option?
+                stdscr.addstr("\n")
                 service.printInfo(stdscr)
+                service.printActions(stdscr)
         index += 1
         if choice == ord(str(index)):
-            return 
+            return
 
 
 def printSubMenu(stdscr, device):
@@ -215,13 +214,13 @@ def printSubMenu(stdscr, device):
         index += 1
         stdscr.addstr("[{0}] View Services ({1} found)\n".format(index, str(len(device.serviceList))))
     index += 1
-    stdscr.addstr("[{0}] Back \n".format(index))
+    stdscr.addstr("[{0}] Back\n\n".format(index))
     stdscr.refresh()
 
 
+# noinspection PyUnresolvedReferences
 def subMenu(stdscr, device):
     printSubMenu(stdscr, device)
-
     while True:
         index = 1
         choice = stdscr.getch()
@@ -239,12 +238,14 @@ def subMenu(stdscr, device):
 
         # Go to the service menu
         if device.serviceList:
-            index +=1
+            index += 1
             if choice == ord(str(index)):
-               serviceMenu(stdscr, device)
+                serviceMenu(stdscr, device)
+                printSubMenu(stdscr, device)
+                stdscr.refresh()
 
         # Go back to the main menu
-        index +=1
+        index += 1
         if choice == ord(str(index)):
             printMenu(stdscr)
             return
@@ -280,7 +281,7 @@ def main(stdscr):
             stdscr.refresh()
 
 # Curses config
-stdscr = curses.initscr()
+mainWindow = curses.initscr()
 curses.noecho()
 curses.cbreak()
 
@@ -289,4 +290,3 @@ curses.init_pair(1, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
 curses.init_pair(2, curses.COLOR_RED, curses.COLOR_WHITE)
 
 wrapper(main)
-

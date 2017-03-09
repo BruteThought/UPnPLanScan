@@ -1,9 +1,8 @@
 from urllib.parse import urlparse
-from bcolors import bcolors
+import curses
 
 
-# noinspection PyPep8Naming
-class service:
+class Service:
     def __init__(self, deviceType, deviceId, controlURL, eventSubURL, SCPDURL):
         self.type = str(deviceType)
         self.id = str(deviceId)
@@ -22,15 +21,14 @@ class service:
         stdscr.addstr("SCPDURL:\t{0}\n".format(repr(str("/" + self.SCPDURL))))
         stdscr.refresh()
 
-    def printActions(self):
+    def printActions(self, stdscr):
         for action in self.actionList:
-            print(bcolors.OKGREEN + "\t\t└ Action: {0}".format(action.name) + bcolors.ENDC)
+            stdscr.addstr("Action: {0}\n".format(action.name), curses.A_BOLD)
             for argument in action.argumentList:
                 if type(argument.relatedStateVariable) is not str:
-                    print(bcolors.WARNING + "\t\t  {:4} {:32} {:10} {}".format(argument.direction,
-                                                                           argument.name,
-                                                                           argument.relatedStateVariable.dataType,
-                                                                           argument.relatedStateVariable.defaultValue) + bcolors.ENDC)
+                    stdscr.addstr("\t{:4} {:32} {:10} {}\n".format(argument.direction,
+                                                                   argument.name,
+                                                                   argument.relatedStateVariable.dataType,
+                                                                   argument.relatedStateVariable.defaultValue))
                 else:
-                    print(bcolors.WARNING + "\t  {0}\t {1}".format(argument.direction,
-                                                                       argument.name) + bcolors.ENDC)
+                    stdscr.addstr("{0}\t {1}\n".format(argument.direction, argument.name))

@@ -1,9 +1,8 @@
 import re
 import urllib.request
 import urllib.error
-# noinspection PyPep8Naming
-import xml.etree.ElementTree as ET
-from service import service
+import xml.etree.ElementTree as elementTree
+from service import Service
 from action import action
 from argument import argument
 from variable import variable
@@ -12,6 +11,7 @@ import curses
 
 # TODO: Somehow pull all of the comments from the xml docs as well
 # TODO: Strip all of the inputs for trailing/leading stuff as well as escape characters.
+
 
 def get_arguments(argumentList, variableDict):
     # TODO: Try/Catch for this section
@@ -44,9 +44,8 @@ def get_actions(stdscr, device, service):
     if XMLDocument is None:
         stdscr.addstr("[*] Document at {0} could not be obtained. Skipping.\n" + bcolors.ENDC.format(repr(XMLURL)), curses.color_pair(2))
     else:
-    #try:
         # Get the root of the structure
-        root = ET.fromstring(XMLDocument)
+        root = elementTree.fromstring(XMLDocument)
 
         # Get the namespace of the device, set to blank if none
         # TODO: Check if Namespace is required for actions
@@ -79,18 +78,17 @@ def get_actions(stdscr, device, service):
             # Get the variableArray into a key/value structure, then pass it as an argument
             argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'), variableDict)
             actionArray.append(action(name, argumentList))
-    #except:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
         # TODO: narrow down this exception clause
-        #stdscr.addstr("Actions XML Document at: '{0}' could not be parsed, skipping.\n".format(XMLURL), curses.color_pair(2))
-        #stdscr.refresh()
+        # stdscr.addstr("Actions XML Document at: '{0}' could not be parsed, skipping.\n".format(XMLURL), curses.color_pair(2))
+        # stdscr.refresh()
         return actionArray
 
 
 def get_services(stdscr, device):
     serviceArray = []
     XMLURL = str(device.baseURL + device.rootXML)
-    #print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
+    # print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
     XMLDocument = get_xml_document(XMLURL)
 
     # If the document could not be obtained
@@ -100,31 +98,32 @@ def get_services(stdscr, device):
     else:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
         # TODO: narrow down this exception clause
-        try:
-            # Get the root of the structure
-            root = ET.fromstring(XMLDocument)
+        # try:
+        # Get the root of the structure
+        root = elementTree.fromstring(XMLDocument)
 
-            # Get the namespace of the device, set to blank if none
-            XMLNamespace = re.match('\{.*\}', root.tag).group(0)
-            if XMLNamespace is None:
-                print(bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + bcolors.ENDC)
-                XMLNamespace = ""
+        # Get the namespace of the device, set to blank if none
+        XMLNamespace = re.match('\{.*\}', root.tag).group(0)
+        if XMLNamespace is None:
+            print(bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + bcolors.ENDC)
+            XMLNamespace = ""
 
-            # Get the device node to get the service info.
-            device = root.find(XMLNamespace + 'device')
-            servicelist = device.find(XMLNamespace + 'serviceList')
+        # Get the device node to get the service info.
+        device = root.find(XMLNamespace + 'device')
+        servicelist = device.find(XMLNamespace + 'serviceList')
 
-            # Find all of the services
-            for serviceNode in servicelist.findall(XMLNamespace + 'service'):
-                serviceType = serviceNode.find(XMLNamespace + 'serviceType').text
-                serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
-                copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
-                eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
-                SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
+        # Find all of the services
+        for serviceNode in servicelist.findall(XMLNamespace + 'service'):
+            serviceType = serviceNode.find(XMLNamespace + 'serviceType').text
+            serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
+            copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
+            eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
+            SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
 
-                serviceArray.append(service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
-        except:
-            stdscr.add("[*] Document at: '{0}' could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
+            serviceArray.append(Service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
+        # TODO : put this except back in when you figure out what errors you are getting to justify it!
+        # except:
+        #    stdscr.add("[*] Document at: '{0}' could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
         return serviceArray
 
 
