@@ -13,21 +13,68 @@ import curses
 # TODO: Strip all of the inputs for trailing/leading stuff as well as escape characters.
 
 
-def get_arguments(argumentList, variableDict):
-    # TODO: Try/Catch for this section
-    argumentArray = []
-    XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
-    for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
-        name = argumentNode.find(XMLNamespace + 'name').text
-        direction = argumentNode.find(XMLNamespace + 'direction').text
-        relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable').text
-        if relatedStateVariable in variableDict:
-            relatedStateVariable = variableDict[relatedStateVariable]
-        else:
-            relatedStateVariable = Variable(relatedStateVariable, "?", "?")
+def get_xml_document(XMLURL):
+    # TODO: if the XML fails, it should immediately be saved in raw form for later use.
+    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful, but could be useful for the user.
+    attempts = 0
+    while attempts < 3:
+        attempts += 1
 
-        argumentArray.append(Argument(name, direction, relatedStateVariable))
-    return argumentArray
+        # TODO: have to properly validate whether or not it is a valid URL!
+        if XMLURL == "":
+            print(Bcolors.FAIL + "No XML location given! Skipping." + Bcolors.ENDC)
+            break
+        try:
+            XMLDocument = urllib.request.urlopen(XMLURL).read()
+            return XMLDocument
+        except urllib.error.URLError as e:
+            # If the document could not be obtained
+            print(Bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + Bcolors.ENDC)
+        except ValueError as e:
+            print(Bcolors.FAIL + "{0}".format(e) + Bcolors.ENDC)
+    return None
+
+
+def get_services(stdscr, device):
+    serviceArray = []
+    XMLURL = str(device.baseURL + device.rootXML)
+    # print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
+    XMLDocument = get_xml_document(XMLURL)
+
+    # If the document could not be obtained
+    if XMLDocument is None:
+        stdscr.add("[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping.\n", curses.color_pair(2))
+        stdscr.refresh()
+    else:
+        # TODO: need to have a try catch for corrupted/non XML files at the provided location.
+        # TODO: narrow down this exception clause
+        # try:
+        # Get the root of the structure
+        root = elementTree.fromstring(XMLDocument)
+
+        # Get the namespace of the device, set to blank if none
+        XMLNamespace = re.match('\{.*\}', root.tag).group(0)
+        if XMLNamespace is None:
+            print(Bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + Bcolors.ENDC)
+            XMLNamespace = ""
+
+        # Get the device node to get the service info.
+        device = root.find(XMLNamespace + 'device')
+        servicelist = device.find(XMLNamespace + 'serviceList')
+
+        # Find all of the services
+        for serviceNode in servicelist.findall(XMLNamespace + 'service'):
+            serviceType = serviceNode.find(XMLNamespace + 'serviceType').text
+            serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
+            copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
+            eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
+            SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
+
+            serviceArray.append(Service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
+        # TODO : put this except back in when you figure out what errors you are getting to justify it!
+        # except:
+        #    stdscr.add("[*] Document at: '{0}' could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
+        return serviceArray
 
 
 def get_actions(stdscr, device, service):
@@ -85,65 +132,18 @@ def get_actions(stdscr, device, service):
         return actionArray
 
 
-def get_services(stdscr, device):
-    serviceArray = []
-    XMLURL = str(device.baseURL + device.rootXML)
-    # print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
-    XMLDocument = get_xml_document(XMLURL)
+def get_arguments(argumentList, variableDict):
+    # TODO: Try/Catch for this section
+    argumentArray = []
+    XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
+    for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
+        name = argumentNode.find(XMLNamespace + 'name').text
+        direction = argumentNode.find(XMLNamespace + 'direction').text
+        relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable').text
+        if relatedStateVariable in variableDict:
+            relatedStateVariable = variableDict[relatedStateVariable]
+        else:
+            relatedStateVariable = Variable(relatedStateVariable, "?", "?")
 
-    # If the document could not be obtained
-    if XMLDocument is None:
-        stdscr.add("[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping.\n", curses.color_pair(2))
-        stdscr.refresh()
-    else:
-        # TODO: need to have a try catch for corrupted/non XML files at the provided location.
-        # TODO: narrow down this exception clause
-        # try:
-        # Get the root of the structure
-        root = elementTree.fromstring(XMLDocument)
-
-        # Get the namespace of the device, set to blank if none
-        XMLNamespace = re.match('\{.*\}', root.tag).group(0)
-        if XMLNamespace is None:
-            print(Bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + Bcolors.ENDC)
-            XMLNamespace = ""
-
-        # Get the device node to get the service info.
-        device = root.find(XMLNamespace + 'device')
-        servicelist = device.find(XMLNamespace + 'serviceList')
-
-        # Find all of the services
-        for serviceNode in servicelist.findall(XMLNamespace + 'service'):
-            serviceType = serviceNode.find(XMLNamespace + 'serviceType').text
-            serviceId = serviceNode.find(XMLNamespace + 'serviceId').text
-            copntrolURL = serviceNode.find(XMLNamespace + 'controlURL').text
-            eventsubURL = serviceNode.find(XMLNamespace + 'eventSubURL').text
-            SCPDURL = serviceNode.find(XMLNamespace + 'SCPDURL').text
-
-            serviceArray.append(Service(serviceType, serviceId, copntrolURL, eventsubURL, SCPDURL))
-        # TODO : put this except back in when you figure out what errors you are getting to justify it!
-        # except:
-        #    stdscr.add("[*] Document at: '{0}' could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
-        return serviceArray
-
-
-def get_xml_document(XMLURL):
-    # TODO: if the XML fails, it should immediately be saved in raw form for later use.
-    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful, but could be useful for the user.
-    attempts = 0
-    while attempts < 3:
-        attempts += 1
-
-        # TODO: have to properly validate whether or not it is a valid URL!
-        if XMLURL == "":
-            print(Bcolors.FAIL + "No XML location given! Skipping." + Bcolors.ENDC)
-            break
-        try:
-            XMLDocument = urllib.request.urlopen(XMLURL).read()
-            return XMLDocument
-        except urllib.error.URLError as e:
-            # If the document could not be obtained
-            print(Bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + Bcolors.ENDC)
-        except ValueError as e:
-            print(Bcolors.FAIL + "{0}".format(e) + Bcolors.ENDC)
-    return None
+        argumentArray.append(Argument(name, direction, relatedStateVariable))
+    return argumentArray
