@@ -1,5 +1,6 @@
 import urllib
 import curses
+import riskassess
 
 
 class Service:
@@ -12,7 +13,7 @@ class Service:
         parsed_uri = urllib.urlparse(SCPDURL)
         self.SCPDURL = str('{uri.path}'.format(uri=parsed_uri).strip("/"))
         self.actionList = []
-        self.riskRanking = 0
+        self.risk = riskassess.getRisk(self.type)
 
     def printInfo(self, stdscr):
         stdscr.addstr("serviceType:\t{0}\n".format(repr(str(self.type))))
