@@ -6,44 +6,22 @@ from service import Service
 from action import Action
 from argument import Argument
 from variable import Variable
-from bcolors import Bcolors
 import curses
 
 # TODO: Somehow pull all of the comments from the xml docs as well
 # TODO: Strip all of the inputs for trailing/leading stuff as well as escape characters.
 
 
-def get_xml_document(XMLURL):
-    # TODO: if the XML fails, it should immediately be saved in raw form for later use.
-    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful, but could be useful for the user.
-    attempts = 0
-    while attempts < 3:
-        attempts += 1
-
-        # TODO: have to properly validate whether or not it is a valid URL!
-        if XMLURL == "":
-            print(Bcolors.FAIL + "No XML location given! Skipping." + Bcolors.ENDC)
-            break
-        try:
-            XMLDocument = urllib.request.urlopen(XMLURL).read()
-            return XMLDocument
-        except urllib.error.URLError as e:
-            # If the document could not be obtained
-            print(Bcolors.FAIL + "XML fetch error {0}: {1}".format(e, XMLURL) + Bcolors.ENDC)
-        except ValueError as e:
-            print(Bcolors.FAIL + "{0}".format(e) + Bcolors.ENDC)
-    return None
-
-
+# Get the service information
 def get_services(stdscr, device):
     serviceArray = []
-    XMLURL = str(device.baseURL + device.rootXML)
-    # print(bcolors.OKBLUE + "Attempting to open remote manifest XML document" + bcolors.ENDC)
-    XMLDocument = get_xml_document(XMLURL)
 
-    # If the document could not be obtained
+    XMLURL = str(device.baseURL + device.rootXML)
+    XMLDocument = get_xml_document(stdscr, XMLURL)
+
+    # If the document URL is empty
     if XMLDocument is None:
-        stdscr.add("[*] Document at " + repr(XMLURL) + " could not be obtained. Skipping.\n", curses.color_pair(2))
+        stdscr.add("[*] Document at {0} could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
         stdscr.refresh()
     else:
         # TODO: need to have a try catch for corrupted/non XML files at the provided location.
@@ -55,7 +33,8 @@ def get_services(stdscr, device):
         # Get the namespace of the device, set to blank if none
         XMLNamespace = re.match('\{.*\}', root.tag).group(0)
         if XMLNamespace is None:
-            print(Bcolors.WARNING + 'XMLNamespace could not be found, defaulting to blank' + Bcolors.ENDC)
+            stdscr.add('XMLNamespace could not be found, defaulting to blank\n', curses.color_pair(2))
+            stdscr.refresh()
             XMLNamespace = ""
 
         # Get the device node to get the service info.
@@ -77,19 +56,19 @@ def get_services(stdscr, device):
         return serviceArray
 
 
+# Get the actions of the service.
 def get_actions(stdscr, device, service):
-
     # Should change everything into objects, THEN pass them around, rather than passing around XML then selectively parsing.
     XMLURL = str(device.baseURL + service.SCPDURL)
 
     actionArray = []
     variableDict = {}
     # print(bcolors.OKBLUE + "Attempting to open remote Actions XML document" + bcolors.ENDC)
-    XMLDocument = get_xml_document(XMLURL)
+    XMLDocument = get_xml_document(stdscr, XMLURL)
 
     # If the document could not be obtained
     if XMLDocument is None:
-        stdscr.addstr("[*] Document at {0} could not be obtained. Skipping.\n" + Bcolors.ENDC.format(repr(XMLURL)), curses.color_pair(2))
+        stdscr.addstr("[*] Document at {0} could not be obtained. Skipping.\n".format(repr(XMLURL)), curses.color_pair(2))
     else:
         # Get the root of the structure
         root = elementTree.fromstring(XMLDocument)
@@ -108,7 +87,6 @@ def get_actions(stdscr, device, service):
         # Loop through the variable state table in order to get info for later references.
         for variableNode in stateVariableList.findall(XMLNamespace + 'stateVariable'):
             name = variableNode.find(XMLNamespace + 'name')
-
             data_type = variableNode.find(XMLNamespace + 'dataType')
             default_value = variableNode.find(XMLNamespace + 'defaultValue')
             if name:
@@ -120,7 +98,9 @@ def get_actions(stdscr, device, service):
             variableDict[name] = Variable(name, data_type, default_value)
 
         for actionNode in actionList.findall(XMLNamespace + 'action'):
-            name = actionNode.find(XMLNamespace + 'name').text
+            name = actionNode.find(XMLNamespace + 'name')
+            if name:
+                name = name.text
 
             # Get the variableArray into a key/value structure, then pass it as an argument
             argumentList = get_arguments(actionNode.find(XMLNamespace + 'argumentList'), variableDict)
@@ -132,18 +112,52 @@ def get_actions(stdscr, device, service):
         return actionArray
 
 
+# Parse the arguments for an action,
 def get_arguments(argumentList, variableDict):
     # TODO: Try/Catch for this section
     argumentArray = []
     XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
     for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
-        name = argumentNode.find(XMLNamespace + 'name').text
-        direction = argumentNode.find(XMLNamespace + 'direction').text
-        relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable').text
+        name = argumentNode.find(XMLNamespace + 'name')
+        if name:
+            name = name.text
+
+        direction = argumentNode.find(XMLNamespace + 'direction')
+        if direction:
+            direction = direction.text
+
+        relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable')
+        if relatedStateVariable:
+            relatedStateVariable = relatedStateVariable.text
+
+        # If we already know what that variable is, we can grab the datatype and the default value!
         if relatedStateVariable in variableDict:
             relatedStateVariable = variableDict[relatedStateVariable]
         else:
+            # Otherwise put them both down as unknown
             relatedStateVariable = Variable(relatedStateVariable, "?", "?")
-
         argumentArray.append(Argument(name, direction, relatedStateVariable))
     return argumentArray
+
+
+# Download the xml document at the provided URL.
+def get_xml_document(stdscr, XMLURL):
+    # TODO: if the XML fails, it should immediately be saved in raw form for later use.
+    # in terms of ps4 for example, it just returns "status=ok" which isn't exactly useful, but could be useful for the user.
+    attempts = 0
+    while attempts < 3:
+        attempts += 1
+
+        # TODO: have to properly validate whether or not it is a valid URL!
+        if XMLURL == "":
+            stdscr.add("No XML location given! Skipping.", curses.color_pair(2))
+            break
+        try:
+            XMLDocument = urllib.request.urlopen(XMLURL).read()
+            return XMLDocument
+        except urllib.error.URLError as e:
+            # If the document could not be obtained
+            stdscr.add("XML fetch error {0}: {1}".format(e, XMLURL), curses.color_pair(2))
+        except ValueError as e:
+            stdscr.add("{0}".format(e), curses.color_pair(2))
+    return None

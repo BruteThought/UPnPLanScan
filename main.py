@@ -1,6 +1,5 @@
 import argparse
 import time
-import XMLReader
 import threading
 import curses
 import scanner
@@ -23,12 +22,10 @@ def main(stdscr):
     while True:
         choice = stdscr.getch()
         if choice == ord("1"):
-            result = []
             thread = threading.Thread(target=startScan)
             thread.start()
             loadingLoop(stdscr, len(deviceDict), thread)
             thread.join()
-
             printMenu(stdscr)
 
         elif choice == ord("q"):

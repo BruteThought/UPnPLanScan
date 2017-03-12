@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+import urllib
 import curses
 
 
@@ -8,7 +8,8 @@ class Service:
         self.id = str(deviceId)
         self.controlURL = str(controlURL)
         self.eventSubURL = str(eventSubURL)
-        parsed_uri = urlparse(SCPDURL)
+        # noinspection PyUnresolvedReferences
+        parsed_uri = urllib.urlparse(SCPDURL)
         self.SCPDURL = str('{uri.path}'.format(uri=parsed_uri).strip("/"))
         self.actionList = []
         self.riskRanking = 0

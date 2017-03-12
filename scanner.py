@@ -97,9 +97,6 @@ def cleanReg(result) -> str:
 
 # Scan through all of the services
 def scanServices(stdscr, device):
-    # deviceDict[key].printInfo()
-    # TODO: at url... what? I think the url was meant to be included here.
-
     # Read the root manifest for services, then create a list of them
     device.serviceList = XMLReader.get_services(stdscr, device)
 

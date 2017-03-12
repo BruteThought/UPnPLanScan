@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+import urllib
 
 
 class Device:
@@ -6,7 +6,8 @@ class Device:
         self.cache = cache
         self.date = date
 
-        parsed_uri = urlparse(location)
+        # noinspection PyUnresolvedReferences
+        parsed_uri = urllib.urlparse(location)
         self.baseURL = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         # Remove the leading slash, this is already covered in the base URL
         self.rootXML = '{uri.path}'.format(uri=parsed_uri).strip("/")
