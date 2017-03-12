@@ -23,7 +23,8 @@ def main(stdscr):
     while True:
         choice = stdscr.getch()
         if choice == ord("1"):
-            thread = threading.Thread(target=deviceScan, args=(deviceDict, args))
+            result = []
+            thread = threading.Thread(target=startScan)
             thread.start()
             loadingLoop(stdscr, len(deviceDict), thread)
             thread.join()
@@ -178,6 +179,12 @@ def loadingLoop(stdscr, index, thread):
         stdscr.addstr(index, 0, "Scanning...")
         stdscr.refresh()
         time.sleep(0.5)
+
+
+# This "proxy" function allows the thread to return a value to the global deviceDict variable
+def startScan():
+    global deviceDict
+    deviceDict = scanner.deviceScan(deviceDict, args)
 
 
 # Make the window, don't output input to screen, accept characters without a buffer but allow special character affects

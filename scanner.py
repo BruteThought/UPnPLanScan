@@ -52,7 +52,7 @@ def deviceScan(deviceDict, args):
         except socket.timeout:
             # If sufficient time has passed, break out of it.
             if time.time() > timeout:
-                break
+                return deviceDict
 
         sock.settimeout(0)
 
@@ -68,7 +68,7 @@ def deviceScan(deviceDict, args):
             # TODO: Should probably do something if I don't get the right package
 
         if time.time() > timeout:
-            return  deviceDict
+            return deviceDict
 
 
 # Decode the response to the M-SEARCH
