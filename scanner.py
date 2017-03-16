@@ -49,6 +49,9 @@ def deviceScan(deviceDict, args):
         try:
             sock.settimeout(5.0)
             message = str(sock.recv(10240), 'utf-8')
+            text_file = open("output.txt", "a")
+            text_file.write(message)
+            text_file.close()
         except socket.timeout:
             # If sufficient time has passed, break out of it.
             if time.time() > timeout:

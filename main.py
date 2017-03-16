@@ -3,6 +3,8 @@ import time
 import threading
 import curses
 import scanner
+# A temporary module that is just for testing new functions!
+import scrollPad
 deviceDict = {}
 menuDevices = {}
 
@@ -36,6 +38,48 @@ def main(stdscr):
             index = int(chr(choice))
             if index in menuDevices:
                 deviceMenu(stdscr, menuDevices[index])
+        elif choice == ord("t"):
+            scrollPad.scrollPad(stdscr, """hello
+            this is a test
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            a
+            oboi
+
+            I can't believe this
+
+            Leloboi
+            test
+            t
+
+
+
+
+            dest
+            test
+
+
+
+
+
+            d
+
+
+
+            end of file""")
+            stdscr.clear()
+            printMenu(stdscr)
 
         else:
             stdscr.addstr("Invalid selection\n")
@@ -52,7 +96,7 @@ def deviceMenu(stdscr, device):
 
         # Scan the services of the device
         if choice == ord(str(index)):
-            device = scanServices(stdscr, device)
+            device = scanner.scanServices(stdscr, device)
             printDeviceMenu(stdscr, device)
 
         # Print the device info
@@ -116,6 +160,8 @@ def printMenu(stdscr):
         menuDevices[i] = deviceDict[key]
         stdscr.addstr("[" + str(i) + "]" + str(repr(deviceDict[key].usn)) + "\n")
     stdscr.addstr("[q] Quit\n")
+
+    stdscr.addstr("a" + str(stdscr.getbkgd()) + "b")
     stdscr.refresh()
 
 
@@ -185,9 +231,10 @@ def startScan():
 
 
 # Make the window, don't output input to screen, accept characters without a buffer but allow special character affects
-# (i.e. ctrl+c will still exit)
+# (i.e. ctrl+c will still exit) and make the cursor invisible
 mainWindow = curses.initscr()
 curses.noecho()
+curses.curs_set(0)
 curses.cbreak()
 
 # Set up the colours for the terminal output

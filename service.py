@@ -10,7 +10,7 @@ class Service:
         self.controlURL = str(controlURL)
         self.eventSubURL = str(eventSubURL)
         # noinspection PyUnresolvedReferences
-        parsed_uri = urllib.urlparse(SCPDURL)
+        parsed_uri = urllib.parse.urlparse(SCPDURL)
         self.SCPDURL = str('{uri.path}'.format(uri=parsed_uri).strip("/"))
         self.actionList = []
         self.risk = riskassess.getRisk(self.type)
@@ -25,7 +25,7 @@ class Service:
 
     def printActions(self, stdscr):
         for action in self.actionList:
-            stdscr.addstr("Action: {0}\n".format(action.name), curses.A_BOLD)
+            stdscr.addstr("Actions: {0}\n".format(action.name), curses.A_BOLD)
             for argument in action.argumentList:
                 if type(argument.relatedStateVariable) is not str:
                     stdscr.addstr("\t{:4} {:32} {:10} {}\n".format(argument.direction,

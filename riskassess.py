@@ -1,8 +1,9 @@
-def getRisk(name):
+def getRisk(name: str):
     # Search for an occurrance of a risky name in the action name.
-    dangerousNames = ["admin", "password", "update", "login", "factory", "reset", "remote"]
-    riskyNames = ["setup", "database", "shutdown", "email", "import"]
-    infoNames = ["info", "export"]
+    dangerousNames = ["admin", "password", "update", "login", "factory", "reset", "remote", "register", "default",
+                      "ssh", "debug", "cmd", "shell", "ftp", "test", "root", "sudo"]
+    riskyNames = ["setup", "database", "shutdown", "email", "import", "sql", "cli", "cgi", "upload", "download"]
+    infoNames = ["info", "export", "csv", "details"]
 
     # Go through each "danger list" and return the danger level
     for searchName in dangerousNames:

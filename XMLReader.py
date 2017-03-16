@@ -99,7 +99,7 @@ def get_actions(stdscr, device, service):
 
         for actionNode in actionList.findall(XMLNamespace + 'action'):
             name = actionNode.find(XMLNamespace + 'name')
-            if name:
+            if name is not None:
                 name = name.text
 
             # Get the variableArray into a key/value structure, then pass it as an argument
@@ -119,15 +119,15 @@ def get_arguments(argumentList, variableDict):
     XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
     for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
         name = argumentNode.find(XMLNamespace + 'name')
-        if name:
+        if name is not None:
             name = name.text
 
         direction = argumentNode.find(XMLNamespace + 'direction')
-        if direction:
+        if direction is not None:
             direction = direction.text
 
         relatedStateVariable = argumentNode.find(XMLNamespace + 'relatedStateVariable')
-        if relatedStateVariable:
+        if relatedStateVariable is not None:
             relatedStateVariable = relatedStateVariable.text
 
         # If we already know what that variable is, we can grab the datatype and the default value!

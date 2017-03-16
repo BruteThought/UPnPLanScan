@@ -7,7 +7,7 @@ class Device:
         self.date = date
 
         # noinspection PyUnresolvedReferences
-        parsed_uri = urllib.urlparse(location)
+        parsed_uri = urllib.parse.urlparse(location)
         self.baseURL = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         # Remove the leading slash, this is already covered in the base URL
         self.rootXML = '{uri.path}'.format(uri=parsed_uri).strip("/")
@@ -25,7 +25,7 @@ class Device:
         stdscr.addstr("Cache: \t\t{0}\n".format(repr(self.cache)))
         stdscr.addstr("Date: \t\t{0}\n".format(repr(self.date)))
         stdscr.addstr("Location: \t{0}\n".format(repr(self.baseURL + self.rootXML)))
-        stdscr.addstr("Base: \t{0}\n".format(repr(self.baseURL)))
+        stdscr.addstr("Base: \t\t{0}\n".format(repr(self.baseURL)))
         stdscr.addstr("Opt: \t\t{0}\n".format(repr(self.opt)))
         stdscr.addstr("NLS: \t\t{0}\n".format(repr(self.nls)))
         stdscr.addstr("Server: \t{0}\n".format(repr(self.server)))
