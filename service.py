@@ -1,6 +1,7 @@
 import urllib
 import curses
 import riskassess
+from scrollPad import scrollPad
 
 
 class Service:
@@ -16,21 +17,27 @@ class Service:
         self.risk = riskassess.getRisk(self.type)
 
     def printInfo(self, stdscr):
-        stdscr.addstr("serviceType:\t{0}\n".format(repr(str(self.type))))
-        stdscr.addstr("serviceId:\t{0}\n".format(repr(str(self.id))))
-        stdscr.addstr("controlURL:\t{0}\n".format(repr(str(self.controlURL))))
-        stdscr.addstr("eventSubURL:\t{0}\n".format(repr(str(self.eventSubURL))))
-        stdscr.addstr("SCPDURL:\t{0}\n".format(repr(str("/" + self.SCPDURL))))
-        stdscr.refresh()
+        scrollPad(stdscr, self.getInfoString())
+
+    def getInfoString(self) -> str:
+        output = "serviceType:\t{0}\n".format(repr(str(self.type)))
+        output += "serviceId:\t{0}\n".format(repr(str(self.id)))
+        output += "controlURL:\t{0}\n".format(repr(str(self.controlURL)))
+        output += "eventSubURL:\t{0}\n".format(repr(str(self.eventSubURL)))
+        output += "SCPDURL:\t{0}\n".format(repr(str("/" + self.SCPDURL)))
+        return output
 
     def printActions(self, stdscr):
+        output = self.getInfoString()
+        output += "\n"
         for action in self.actionList:
-            stdscr.addstr("Actions: {0}\n".format(action.name), curses.A_BOLD)
+            output += "Actions: {0}\n".format(action.name)
             for argument in action.argumentList:
                 if type(argument.relatedStateVariable) is not str:
-                    stdscr.addstr("\t{:4} {:32} {:10} {}\n".format(argument.direction,
+                    output += "\t{:4} {:32} {:10} {}\n".format(argument.direction,
                                                                    argument.name,
                                                                    argument.relatedStateVariable.dataType,
-                                                                   argument.relatedStateVariable.defaultValue))
+                                                                   argument.relatedStateVariable.defaultValue)
                 else:
-                    stdscr.addstr("{0}\t {1}\n".format(argument.direction, argument.name))
+                    output += "{0}\t {1}\n".format(argument.direction, argument.name)
+        scrollPad(stdscr, output)

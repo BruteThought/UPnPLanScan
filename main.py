@@ -103,6 +103,7 @@ def deviceMenu(stdscr, device):
         index += 1
         if choice == ord(str(index)):
             device.printInfo(stdscr)
+            printDeviceMenu(stdscr, device)
             stdscr.refresh()
 
         # Go to the service menu
@@ -130,10 +131,9 @@ def serviceMenu(stdscr, device):
         for service in device.serviceList:
             index += 1
             if choice == ord(str(index)):
-                # TODO: should this printInfo be included or not? Seperate it out into a different menu option?
                 stdscr.addstr("\n")
-                service.printInfo(stdscr)
                 service.printActions(stdscr)
+                printServiceMenu(stdscr, device)
         index += 1
         if choice == ord(str(index)):
             return
@@ -161,7 +161,6 @@ def printMenu(stdscr):
         stdscr.addstr("[" + str(i) + "]" + str(repr(deviceDict[key].usn)) + "\n")
     stdscr.addstr("[q] Quit\n")
 
-    stdscr.addstr("a" + str(stdscr.getbkgd()) + "b")
     stdscr.refresh()
 
 

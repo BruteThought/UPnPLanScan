@@ -2,16 +2,27 @@ import curses
 
 
 def scrollPad(stdscr, stringInput):
-    # Get number of newlines in a string
-    inputHeight = len(stringInput.split("\n"))
-
     # Get the current size of the window and save it
     height, width = stdscr.getmaxyx()
+
+    # Get number of newlines in a string
+    splitInput = stringInput.split("\n")
+    inputHeight = len(splitInput)
+
+    # If the line would wrap around, add 1 to the inputheight
+    for line in splitInput:
+        lineLength = len(line)
+
+        # Tabs are equal to 1 in len, but 8 in spaces, so add 7 to get everything back in alignment.
+        tabNo = len(line.split("\t"))
+        lineLength += tabNo * 7
+
+        if lineLength >= width:
+            inputHeight += 1
 
     # Create a new pad with maximum width and however high the string is, including a line position
     mypad = curses.newpad(inputHeight, width)
     mypad_pos = 0
-
     mypad.addstr(stringInput)
     addStatus(stdscr)
 
