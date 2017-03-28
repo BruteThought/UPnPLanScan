@@ -23,3 +23,16 @@ When in "view" mode, use j/k to scroll up or down and 'q' to go back.
 An example of usage is to first scan for devices on your network using "1", any devices that are found will be automatically
 listed with a numeric id in the menu. Press it's number to perform additional actions like viewing general device information
 or scan for further services and actions.
+
+## Demo
+[![UPnPLanScan Demo](http://i.imgur.com/cjSqaK1.png)](https://www.youtube.com/watch?v=NjcHfEYuTA8)
+
+## Contributing
+Feel free to contribute! This tool is still in development, so look for #TODO tags if you would like to improve the stability of the overall application.
+
+We would also like to expand/include some new features, some examples being:
+- fuzzing
+- run actions with custom parameters
+- automatically pick out developer comments from the service manifests for information leakage
+
+If you want to develop one of these features, make sure to check there isn't a branch already in development!
