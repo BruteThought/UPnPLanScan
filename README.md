@@ -13,10 +13,8 @@ of security research.
 - Recognise potentially exploitable actions
 
 ## Setup
-UPnPLanScan is simple to set up and does not require any additional dependencies.
-
-However, it does require to be **RUN AS ROOT** as otherwise sending/receiving packets will not work correctly.
-
+UPnPLanScan is simple to set up and does not require any additional dependencies.  
+However, it does require to be **RUN AS ROOT** as otherwise sending/receiving packets will not work correctly.  
 Simply run "main.py" as root to start.
 
 ## Usage
@@ -33,7 +31,7 @@ or scan for further services and actions [3].
 ## Contributing
 Feel free to contribute! This tool is still in development, so look for #TODO tags if you would like to improve the stability of the overall application.
 
-We would also like to expand/include some new features, some examples being:
+We would also like to expand/include some new features, some examples being:  
 - fuzzing
 - run actions with custom parameters
 - automatically pick out developer comments from the service manifests for information leakage
