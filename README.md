@@ -1,5 +1,6 @@
 # UPnPLanScan
-A UPnP scanner is a Python 3 program for scanning UPnP compliant devices on your local network.
+UPnPLanScan is a Python 3 program for scanning UPnP compliant devices on your local network for the purpose
+of security research.
 
 ### Features
 - Scan devices on your network using M-SEARCH
@@ -20,9 +21,9 @@ Simply run "main.py" as root to start.
 UPnPLanScan does most of it's operations through the use of numbered menus, select options using the numpad or number row.
 When in "view" mode, use j/k to scroll up or down and 'q' to go back.
 
-An example of usage is to first scan for devices on your network using "1", any devices that are found will be automatically
-listed with a numeric id in the menu. Press it's number to perform additional actions like viewing general device information
-or scan for further services and actions.
+An example of usage is to first scan for devices on your network using [1], any devices that are found will be automatically
+listed with a numeric id in the menu. Press it's number to perform additional actions like viewing general device information [2]
+or scan for further services and actions [3].
 
 ## Demo
 [![UPnPLanScan Demo](http://i.imgur.com/cjSqaK1.png)](https://www.youtube.com/watch?v=NjcHfEYuTA8)
