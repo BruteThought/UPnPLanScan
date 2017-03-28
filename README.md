@@ -14,7 +14,8 @@ of security research.
 
 ## Setup
 UPnPLanScan is simple to set up and does not require any additional dependencies.
-However, it does require to be RUN AS ROOT as otherwise sending/receiving packets will not work correctly.
+
+However, it does require to be **RUN AS ROOT** as otherwise sending/receiving packets will not work correctly.
 Simply run "main.py" as root to start.
 
 ## Usage
