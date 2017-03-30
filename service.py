@@ -1,35 +1,43 @@
-from urllib.parse import urlparse
-from bcolors import bcolors
+import urllib
+import curses
+import riskassess
+from scrollPad import scrollPad
 
 
-# noinspection PyPep8Naming
-class service:
+class Service:
     def __init__(self, deviceType, deviceId, controlURL, eventSubURL, SCPDURL):
         self.type = str(deviceType)
         self.id = str(deviceId)
         self.controlURL = str(controlURL)
         self.eventSubURL = str(eventSubURL)
-        parsed_uri = urlparse(SCPDURL)
+        # noinspection PyUnresolvedReferences
+        parsed_uri = urllib.parse.urlparse(SCPDURL)
         self.SCPDURL = str('{uri.path}'.format(uri=parsed_uri).strip("/"))
         self.actionList = []
-        self.riskRanking = 0
+        self.risk = riskassess.getRisk(self.type)
 
-    def printInfo(self):
-        print("\tserviceType:\t" + self.type)
-        print("\tserviceId:\t" + self.id)
-        print("\tcontrolURL:\t" + self.controlURL)
-        print("\teventSubURL:\t" + self.eventSubURL)
-        print("\tSCPDURL:\t" + "/" + self.SCPDURL)
+    def printInfo(self, stdscr):
+        scrollPad(stdscr, self.getInfoString())
 
-    def printActions(self):
+    def getInfoString(self) -> str:
+        output = "serviceType:\t{0}\n".format(repr(str(self.type)))
+        output += "serviceId:\t{0}\n".format(repr(str(self.id)))
+        output += "controlURL:\t{0}\n".format(repr(str(self.controlURL)))
+        output += "eventSubURL:\t{0}\n".format(repr(str(self.eventSubURL)))
+        output += "SCPDURL:\t{0}\n".format(repr(str("/" + self.SCPDURL)))
+        return output
+
+    def printActions(self, stdscr):
+        output = self.getInfoString()
+        output += "\n"
         for action in self.actionList:
-            print(bcolors.OKGREEN + "\t\t└ Action: {0}".format(action.name) + bcolors.ENDC)
+            output += "Actions: {0}\n".format(action.name)
             for argument in action.argumentList:
                 if type(argument.relatedStateVariable) is not str:
-                    print(bcolors.WARNING + "\t\t  {:4} {:32} {:10} {}".format(argument.direction,
-                                                                           argument.name,
-                                                                           argument.relatedStateVariable.dataType,
-                                                                           argument.relatedStateVariable.defaultValue) + bcolors.ENDC)
+                    output += "\t{:4} {:32} {:10} {}\n".format(argument.direction,
+                                                                   argument.name,
+                                                                   argument.relatedStateVariable.dataType,
+                                                                   argument.relatedStateVariable.defaultValue)
                 else:
-                    print(bcolors.WARNING + "\t  {0}\t {1}".format(argument.direction,
-                                                                       argument.name) + bcolors.ENDC)
+                    output += "{0}\t {1}\n".format(argument.direction, argument.name)
+        scrollPad(stdscr, output)

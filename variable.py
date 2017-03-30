@@ -1,5 +1,5 @@
-class variable:
-    def __init__(self, name, dataType, defaultValue):
+class Variable:
+    def __init__(self, name: str, dataType, defaultValue):
         self.name = name
         self.dataType = dataType
         self.defaultValue = defaultValue
