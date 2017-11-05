@@ -17,14 +17,22 @@ def createConfig():
 
 
 def getConfig(request):
+    configParse.read('config.ini')
     try:
-        return configParse.get('main', str(request))
+        if request in dict(configParse.items('main')):
+            return configParse.get('main', str(request))
+        else:
+            print("GET: Value {0} not found in config".format(str(request)))
     except:
         print("Attempt to get {0} from config failed".format(str(request)))
 
 
 def setConfig(request, value):
+    configParse.read('config.ini')
     try:
-        configParse.set('main', str(request), str(value))
+        if request in dict(configParse.items('main')):
+            configParse.set('main', str(request), str(value))
+        else:
+            print("SET: Value {0} not found in config".format(str(request)))
     except:
         print("Attempt to set {0} with value {1} failed".format(str(request), str(value)))
