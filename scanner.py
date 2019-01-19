@@ -5,17 +5,18 @@ import socket
 import codecs
 import struct
 import XMLReader
+import config
 
 receiving = 1
 
 
 # Send out the scan packet, get the result, and put it into objects.
-def deviceScan(deviceDict, args):
+def deviceScan(deviceDict):
     # Set up the scanning message
     MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
-              "HOST:" + str(args.ip) + ":" + str(args.port) + "\r\n" \
+              "HOST:" + str(config.getConfig('ip')) + ":" + str(config.getConfig('port')) + "\r\n" \
               "ST:upnp:rootdevice\r\n" \
-              "MX:" + str(args.timeout) + "\r\n" \
+              "MX:" + str(config.getConfig('timeout')) + "\r\n" \
               "MAN:\"ssdp:discover\"\r\n\r\n"
     # Set up the UDP port, bind it, then send the M-SEARCH packet.
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -24,17 +25,17 @@ def deviceScan(deviceDict, args):
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     # Bind the socket to the port, then send it
-    sock.bind(("", args.port))
-    sock.sendto(bytes(MESSAGE, "utf-8"), (args.ip, args.port))
+    sock.bind(("", int(config.getConfig('port'))))
+    sock.sendto(bytes(MESSAGE, "utf-8"), (config.getConfig('ip'), int(config.getConfig('port'))))
 
     # Reset the socket to receive instead, prepare to get all of the 200/OK packets
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    sock.bind(("", args.port))
+    sock.bind(("", int(config.getConfig('port'))))
 
     # 4sl = Four letter string signed long
     # Convert the UDP_IP to binary in network byte order
     # INADDR_ANY, receive it for any interface
-    mreq = struct.pack("4sl", socket.inet_aton(args.ip), socket.INADDR_ANY)
+    mreq = struct.pack("4sl", socket.inet_aton(config.getConfig('ip')), socket.INADDR_ANY)
 
     # IPPROTO_IP: socket options that apply to sockets for IPv4 address family
     # IP_ADD_MEMBERSHIP: add as a member of the multicast group
@@ -43,7 +44,7 @@ def deviceScan(deviceDict, args):
 
     # Start listening for responses
     # timeout 5 seconds after the required response time to have a look at devices
-    timeout = time.time() + args.timeout + 5
+    timeout = time.time() + int(config.getConfig('timeout')) + 5
     message = ""
     while receiving:
         try:

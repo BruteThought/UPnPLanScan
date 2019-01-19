@@ -13,7 +13,7 @@ def printTitle():
 def discover():
     print("Discover function ran")
     global deviceDict
-    deviceDict = scanner.deviceScan(deviceDict, args)
+    deviceDict = scanner.deviceScan(deviceDict)
 
 
 def getInfo(deviceID):
