@@ -1,5 +1,5 @@
 import cmd
-import scanner
+#import scanner
 
 deviceDict = {}
 

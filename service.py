@@ -1,5 +1,4 @@
 import urllib
-import curses
 import riskassess
 from scrollPad import scrollPad
 

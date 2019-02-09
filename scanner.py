@@ -92,7 +92,7 @@ def decodepacket(receivedPacket):
 
 
 # Clean up the results but return an empty string if there's nothing.
-def cleanReg(result) -> str:
+def cleanReg(result):
     if result:
         return result.group(1)
     else:
