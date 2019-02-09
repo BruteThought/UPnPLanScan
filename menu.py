@@ -1,13 +1,20 @@
 import cmd
 #import scanner
-
+import argparser
 deviceDict = {}
 
-def printTitle():
+
+def print_title():
     print(" _____ _____     _____ __            _____             ")
     print("|  |  |  _  |___|  _  |  |   ___ ___|   __|___ ___ ___ ")
     print("|  |  |   __|   |   __|  |__| .'|   |__   |  _| .'|   |")
     print("|_____|__|  |_|_|__|  |_____|__,|_|_|_____|___|__,|_|_|")
+
+
+def print_context():
+    # TODO: Print version here
+    if argparser.cmdargs.verbosity:
+        print("[*] Verbosity switch is on\n\n")
 
 
 def discover():
@@ -16,7 +23,7 @@ def discover():
     deviceDict = scanner.deviceScan(deviceDict)
 
 
-def getInfo(deviceID):
+def get_info(deviceID):
     print("Want to get info for device {0}".format(str(deviceID)))
 
 
@@ -25,11 +32,11 @@ def scan(deviceId):
 
 
 
-def listServices(deviceId):
+def list_services(deviceId):
     print("Want to list scanned services of device{0}".format(str(deviceId)))
 
 
-def listActions(deviceId, serviceName):
+def list_actions(deviceId, serviceName):
     print("Want to list actions of device {0}'s service {1}".format(str(deviceId), str(serviceName)))
 
 
@@ -37,11 +44,11 @@ def alias(deviceID, aliasName):
     print("Want to rename {0} as {1}".format(str(deviceID), str(aliasName)))
 
 
-def variableFunction(var, var2):
+def variable_function(var, var2):
     print(var + var2)
 
 
-def checkArgs(args, noOfArgs):
+def check_args(args, noOfArgs):
     if len(args) - 1 != noOfArgs:
         print("*** invalid number of arguments. Required {0}".format(noOfArgs))
         return False

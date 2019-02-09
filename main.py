@@ -1,33 +1,20 @@
-import argparse
+import argparser
+from menu import print_title, print_context
 import threading
 #import scanner
-deviceDict = {}
-menuDevices = {}
-
-# Set up parsing of commandline arguments.
-parser = argparse.ArgumentParser(description="A UPnP scanning, enumerating and fuzzing framework.")
-parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
-parser.add_argument("-t", "--timeout", type=int, default=10, help="maximum time for a device to respond in seconds (default: 10)")
-parser.add_argument("-i", "--ip", default="239.255.255.250", help="the broadcast IP used for the M-SEARCH request (default: 239.255.255.250)")
-parser.add_argument("-p", "--port", type=int, default=1900, help="the port for sending and receiving packets (default: 1900)")
-args = parser.parse_args()
+device_dict = {}
+menu_devices = {}
 
 
 # Set up the menu.
 def main():
     # Print the startup
     print_title()
-    print_context()
+    print_context(argparser.cmdargs)
 
     # Application loop
     while True:
         get_command()
-
-
-def print_context():
-    # TODO: Print version here
-    if args.verbosity:
-        print("[*] Verbosity switch is on\n\n")
 
 
 # Print the main menu
@@ -59,5 +46,10 @@ def start_scan():
     global deviceDict
     #deviceDict = scanner.deviceScan(deviceDict, args)
 
+
+# If we booted from console, get the arguments, if not, probably pytest
+if __name__ == '__main__':
+    print("lol")
+    #argparser.get_cmd_args()
 
 main()
