@@ -23,10 +23,20 @@ def print_context():
 def get_command():
     # TODO: Current device context should be shown in the brackets
     command = input("\033[4m" + "ULS" + "\033[0m" + " device(None) > ")
-    if command == "a":
-        pass
+
+    if command == "scan" or command == "sa":
+        # TODO: should probably make it so that scanning devices/services are parsed differently.
+        # Could take a LONG time on busy networks, so maybe scan all/sa, scan devices/sd and scan services/ss
+        scan_for_devices()
+    elif command == "info" or command == "i":
+        # TODO: should probably make it so that displaying device/service/function info are parsed differently. 
+        print("Display info on a topic")
+    elif command == "quit":
+        # No quick command for this, pressing q instead of s would suck ;)
+        quit()
+        return True
     elif not command:
-        # Just loop back to accepting a command.
+        # Just loop back to waiting for a command.
         pass
     else:
         # Print out an error
@@ -47,11 +57,11 @@ def scan(deviceId):
 
 
 
-def list_services(deviceId):
+def info_services(deviceId):
     print("Want to list scanned services of device{0}".format(str(deviceId)))
 
 
-def list_actions(deviceId, serviceName):
+def info_actions(deviceId, serviceName):
     print("Want to list actions of device {0}'s service {1}".format(str(deviceId), str(serviceName)))
 
 
@@ -121,9 +131,3 @@ class menu(cmd.Cmd):
         sarg = arg.split()
         if check_args(arg, 2):
             alias(sarg[0], sarg[1])
-
-    def do_quit(self, arg):
-        'Exit ULS'
-        print("Quitting")
-        quit()
-        return True
