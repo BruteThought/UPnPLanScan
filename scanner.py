@@ -1,4 +1,4 @@
-from device import Device
+from device import Device, devices
 import re
 import time
 import socket
@@ -11,6 +11,7 @@ receiving = 1
 
 
 # Send out the scan packet, get the result, and put it into objects.
+# TODO: Add the devices you find to the global devices instead of simply returning
 def scan_for_devices(deviceDict):
     # Set up the scanning message
     MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
@@ -87,8 +88,8 @@ def decode_packet(receivedPacket):
         st = cleanReg(re.search(r'(?:ST: ?)(.*)', receivedPacket))
         usn = cleanReg(re.search(r'(?:USN: ?)(.*)', receivedPacket))
 
-        currentDevice = Device(cache, date, location, opt, nls, server, userAgent, st, usn)
-        return currentDevice
+        current_device = Device(cache, date, location, opt, nls, server, userAgent, st, usn)
+        return current_device
 
 
 # Clean up the results but return an empty string if there's nothing.

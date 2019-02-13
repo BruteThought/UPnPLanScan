@@ -1,9 +1,10 @@
 import cmd
-#import scanner
+#from scanner import scan_for_devices
 import argparser
 deviceDict = {}
 
 
+# Print the title when the application starts
 def print_title():
     print(" _____ _____     _____ __            _____             ")
     print("|  |  |  _  |___|  _  |  |   ___ ___|   __|___ ___ ___ ")
@@ -11,6 +12,7 @@ def print_title():
     print("|_____|__|  |_|_|__|  |_____|__,|_|_|_____|___|__,|_|_|")
 
 
+# Print any extra information such as version/switches
 def print_context():
     # TODO: Print version here
     if argparser.cmdargs.verbosity:
@@ -33,8 +35,7 @@ def get_command():
 
 def discover():
     print("Discover function ran")
-    global deviceDict
-    deviceDict = scanner.deviceScan(deviceDict)
+    scan_for_devices()
 
 
 def get_info(deviceID):
