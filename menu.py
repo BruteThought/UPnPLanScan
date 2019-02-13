@@ -22,19 +22,26 @@ def print_context():
 
 # Print the main menu
 def get_command():
+    # TODO: add tab completion.
     command = input("\033[4m" + "ULS" + "\033[0m" + " device({0}) > ".format(get_selected_device_name())).split()
     if command[0] == "scan":
-        # TODO: should probably make it so that scanning devices/services are parsed differently.
-        # Could take a LONG time on busy networks, so maybe scan all/devices/services
+        # TODO: should probably make it so that scanning devices/services are parsed differently.\
+        #  Could take a LONG time on busy networks, so maybe scan all/devices/services
         scan_for_devices()
+    elif command[0] == "help":
+        # TODO: print out a list of the possible commands and how to use them
+        print("Printing help")
     elif command[0] == "info":
         # TODO: should probably make it so that displaying device/service/function info are parsed differently.
         print("Display info on a topic")
     elif command[0] == "clear":
         # TODO: Clear the currently selected device
-        print("clearing")
+        print("Clearing device")
+    elif command[0] == "alias":
+        # TODO: Create an alias for a certain device (maybe the one currently selected? \
+        #  Alternatively, could number in list and use that.)
+        print("Creating alias")
     elif command[0] == "quit":
-        # No quick command for this, pressing q instead of s would suck ;)
         quit()
         return True
     elif not command:
@@ -96,8 +103,6 @@ def check_args(args, noOfArgs):
 
 
 class menu(cmd.Cmd):
-    intro = "Welcome to UPnPLanScan.    Type help or ? to list commands.\n"
-    prompt = "'ULS> "
     file = None
 
     def do_discover(self, arg):
