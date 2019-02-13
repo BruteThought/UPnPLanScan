@@ -2,8 +2,10 @@ from configparser import ConfigParser
 
 configParse = ConfigParser()
 
+# TODO: Set up a switch to overwrite defaults with config.
 
-def createConfig():
+
+def create_config():
     configParse.read('config.ini')
     if not configParse.has_section('main'):
         configParse.add_section('main')
@@ -16,7 +18,7 @@ def createConfig():
             configParse.write(f)
 
 
-def getConfig(request):
+def get_config(request):
     configParse.read('config.ini')
     try:
         if request in dict(configParse.items('main')):
@@ -27,7 +29,7 @@ def getConfig(request):
         print("Attempt to get {0} from config failed".format(str(request)))
 
 
-def setConfig(request, value):
+def set_config(request, value):
     configParse.read('config.ini')
     try:
         if request in dict(configParse.items('main')):

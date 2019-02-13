@@ -1,4 +1,4 @@
-from Device import Device
+from device import Device
 import re
 import time
 import socket
@@ -11,7 +11,7 @@ receiving = 1
 
 
 # Send out the scan packet, get the result, and put it into objects.
-def deviceScan(deviceDict):
+def scan_for_devices(deviceDict):
     # Set up the scanning message
     MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
               "HOST:" + str(config.getConfig('ip')) + ":" + str(config.getConfig('port')) + "\r\n" \
@@ -64,7 +64,7 @@ def deviceScan(deviceDict):
         protocol = re.match(r'^.*', message)
         if protocol.group(0).strip() == "HTTP/1.1 200 OK":
             # Comb through the packet info and put it in a python object
-            packet = decodepacket(codecs.getdecoder("unicode_escape")(message)[0])
+            packet = decode_packet(codecs.getdecoder("unicode_escape")(message)[0])
 
             # Check the USN and put it into an array if there are no matches.
             if packet.usn not in deviceDict:
@@ -76,7 +76,7 @@ def deviceScan(deviceDict):
 
 
 # Decode the response to the M-SEARCH
-def decodepacket(receivedPacket):
+def decode_packet(receivedPacket):
         cache = cleanReg(re.search(r'(?:CACHE-CONTROL: ?)(.*)', receivedPacket))
         date = cleanReg(re.search(r'(?:DATE: ?)(.*)', receivedPacket))
         location = cleanReg(re.search(r'(?:LOCATION: ?)(.*)', receivedPacket))
@@ -100,7 +100,7 @@ def cleanReg(result):
 
 
 # Scan through all of the services
-def scanServices(stdscr, device):
+def scan_device_services(stdscr, device):
     # Read the root manifest for services, then create a list of them
     device.serviceList = XMLReader.get_services(stdscr, device)
 

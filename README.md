@@ -28,6 +28,13 @@ or scan for further services and actions [3].
 ## Demo
 [![UPnPLanScan Demo](http://i.imgur.com/cjSqaK1.png)](https://www.youtube.com/watch?v=NjcHfEYuTA8)
 
+## Testing
+UPnPLanScan uses pytest. Simply run the command:  
+```python -m pytest .```  
+In the root directory.
+
+All of the tests are contained in the ```/tests``` directory
+
 ## Contributing
 Feel free to contribute! This tool is still in development, so look for #TODO tags if you would like to improve the stability of the overall application.
 

@@ -1,6 +1,9 @@
 import urllib
 from scrollPad import scrollPad
 
+# Global device directory
+devices = {}
+
 
 class Device:
     def __init__(self, cache, date, location, opt, nls, server, userAgent, st, usn):
@@ -21,7 +24,7 @@ class Device:
         self.usn = usn
         self.serviceList = []
 
-    def printInfo(self, stdscr):
+    def print_info(self, stdscr):
         info = "USN: \t\t{0}\n".format(repr(self.usn))
         info += "Cache: \t\t{0}\n".format(repr(self.cache))
         info += "Date: \t\t{0}\n".format(repr(self.date))
@@ -34,6 +37,6 @@ class Device:
         info += "ST: \t\t{0}\n".format(repr(self.st))
         scrollPad(stdscr, info)
 
-    def printServices(self, stdscr):
+    def print_services(self, stdscr):
         for service in self.serviceList:
             stdscr.addstr("Service ID:\t {0}\n".format(repr(str(service.id))))

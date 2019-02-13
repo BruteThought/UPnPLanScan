@@ -17,6 +17,20 @@ def print_context():
         print("[*] Verbosity switch is on\n\n")
 
 
+# Print the main menu
+def get_command():
+    # TODO: Current device context should be shown in the brackets
+    command = input("\033[4m" + "ULS" + "\033[0m" + " device(None) > ")
+    if command == "a":
+        pass
+    elif not command:
+        # Just loop back to accepting a command.
+        pass
+    else:
+        # Print out an error
+        print("[*] Unknown Command: {command}".format(command=command))
+
+
 def discover():
     print("Discover function ran")
     global deviceDict
@@ -97,14 +111,14 @@ class menu(cmd.Cmd):
             print("No device specified, using last previously referred device")
             # TODO: Setup last known used device
             lastDevice = "TODO"
-            listActions(lastDevice, sargs[0])
+            list_actions(lastDevice, sargs[0])
         else:
-            listActions(sargs[0], sargs[1])
+            list_actions(sargs[0], sargs[1])
 
     def do_alias(self, arg):
         'Give a device an alias to make it more easily recognisable (you can also use the alias in commands!)'
         sarg = arg.split()
-        if checkArgs(arg, 2):
+        if check_args(arg, 2):
             alias(sarg[0], sarg[1])
 
     def do_quit(self, arg):
@@ -112,8 +126,3 @@ class menu(cmd.Cmd):
         print("Quitting")
         quit()
         return True
-
-
-if __name__ == '__main__':
-    printTitle()
-    menu().cmdloop()
