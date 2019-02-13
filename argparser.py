@@ -1,7 +1,5 @@
 import argparse
 
-# This might be a bit odd, but it helps with setting up pytests without dependent arguments!
-
 
 # Set some defaults, in case the way it was started was... weird.
 class DefaultArgs(object):
