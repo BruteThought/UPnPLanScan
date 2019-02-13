@@ -1,3 +1,2 @@
-.idea/misc.xml
-.idea/UPnPLanScan.iml
-.idea/workspace.xml
+.idea
+.pytest_cache
