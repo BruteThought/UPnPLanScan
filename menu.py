@@ -1,5 +1,6 @@
 import cmd
 #from scanner import scan_for_devices
+from device import selected_device
 import argparser
 deviceDict = {}
 
@@ -21,17 +22,18 @@ def print_context():
 
 # Print the main menu
 def get_command():
-    # TODO: Current device context should be shown in the brackets
-    command = input("\033[4m" + "ULS" + "\033[0m" + " device(None) > ")
-
-    if command == "scan" or command == "sa":
+    command = input("\033[4m" + "ULS" + "\033[0m" + " device({0}) > ".format(get_selected_device_name())).split()
+    if command[0] == "scan":
         # TODO: should probably make it so that scanning devices/services are parsed differently.
-        # Could take a LONG time on busy networks, so maybe scan all/sa, scan devices/sd and scan services/ss
+        # Could take a LONG time on busy networks, so maybe scan all/devices/services
         scan_for_devices()
-    elif command == "info" or command == "i":
-        # TODO: should probably make it so that displaying device/service/function info are parsed differently. 
+    elif command[0] == "info":
+        # TODO: should probably make it so that displaying device/service/function info are parsed differently.
         print("Display info on a topic")
-    elif command == "quit":
+    elif command[0] == "clear":
+        # TODO: Clear the currently selected device
+        print("clearing")
+    elif command[0] == "quit":
         # No quick command for this, pressing q instead of s would suck ;)
         quit()
         return True
@@ -41,6 +43,19 @@ def get_command():
     else:
         # Print out an error
         print("[*] Unknown Command: {command}".format(command=command))
+
+
+# Return the selected devices name (truncated to not take up the full menu)
+def get_selected_device_name():
+    if selected_device is not None:
+        device_name = str(selected_device)
+
+        # If device name is very long, shorten it to limit menu length
+        if len(device_name) > 15:
+            device_name = device_name[0:11] + "..."
+        return device_name
+    else:
+        return "None"
 
 
 def discover():

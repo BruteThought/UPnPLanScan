@@ -3,6 +3,7 @@ from scrollPad import scrollPad
 
 # Global device directory
 devices = {}
+selected_device = None
 
 
 class Device:
