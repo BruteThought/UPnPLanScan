@@ -9,6 +9,8 @@ class DefaultArgs(object):
         self.ip = "239.255.255.250"
         self.port = 1900
 
+# TODO: load the config here to overwrite any defaults. Order is 1) Builtin 2) config 3) flags
+
 
 # Set cmdargs as default initially
 cmdargs = DefaultArgs()
