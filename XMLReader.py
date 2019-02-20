@@ -31,7 +31,7 @@ def get_services(stdscr, device):
         root = elementTree.fromstring(XMLDocument)
 
         # Get the namespace of the device, set to blank if none
-        XMLNamespace = re.match('\{.*\}', root.tag).group(0)
+        XMLNamespace = re.match('{.*}', root.tag).group(0)
         if XMLNamespace is None:
             stdscr.add('XMLNamespace could not be found, defaulting to blank\n', curses.color_pair(2))
             stdscr.refresh()
@@ -75,7 +75,7 @@ def get_actions(stdscr, device, service):
 
         # Get the namespace of the device, set to blank if none
         # TODO: Check if Namespace is required for actions
-        XMLNamespace = re.match('\{.*\}', root.tag).group(0)
+        XMLNamespace = re.match('{.*}', root.tag).group(0)
         if XMLNamespace is None:
             stdscr.addstr("XMLNamespace could not be found, defaulting to blank\n", curses.color_pair(2))
             stdscr.refresh()
@@ -116,7 +116,7 @@ def get_actions(stdscr, device, service):
 def get_arguments(argumentList, variableDict):
     # TODO: Try/Catch for this section
     argumentArray = []
-    XMLNamespace = re.match('\{.*\}', argumentList.tag).group(0)
+    XMLNamespace = re.match('{.*}', argumentList.tag).group(0)
     for argumentNode in argumentList.findall(XMLNamespace + 'argument'):
         name = argumentNode.find(XMLNamespace + 'name')
         if name is not None:

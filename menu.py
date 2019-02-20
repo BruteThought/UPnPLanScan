@@ -1,5 +1,5 @@
 import cmd
-#from scanner import scan_for_devices
+from scanner import scan_for_devices
 from device import selected_device
 import argparser
 

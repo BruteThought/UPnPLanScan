@@ -30,7 +30,7 @@ or scan for further services and actions [3].
 
 ## Testing
 UPnPLanScan uses pytest. Simply run the command:  
-```python -m pytest .```  
+```python3 -m pytest .```  
 In the root directory.
 
 All of the tests are contained in the ```/tests``` directory
