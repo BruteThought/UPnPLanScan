@@ -1,6 +1,6 @@
 import cmd
 from scanner import scan_for_devices
-from device import selected_device
+from device import selected_device, devices
 import argparser
 
 
@@ -27,6 +27,7 @@ def get_command():
         # TODO: should probably make it so that scanning devices/services are parsed differently.\
         #  Could take a LONG time on busy networks, so maybe scan all/devices/services
         scan_for_devices()
+        print(devices)
     elif command[0] == "help":
         # TODO: print out a list of the possible commands and how to use them
         print("Printing help")

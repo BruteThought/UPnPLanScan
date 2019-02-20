@@ -6,6 +6,7 @@ import codecs
 import struct
 import XMLReader
 import argparser
+from sys import stderr, exit
 
 receiving = 1
 
@@ -14,20 +15,25 @@ receiving = 1
 # TODO: Add the devices you find to the global devices instead of simply returning
 def scan_for_devices():
     # Set up the scanning message
-    MESSAGE = "M-SEARCH * HTTP/1.1\r\n" \
+    message = "M-SEARCH * HTTP/1.1\r\n" \
               "HOST:" + str(argparser.cmdargs.ip) + ":" + str(argparser.cmdargs.port) + "\r\n" \
               "ST:upnp:rootdevice\r\n" \
               "MX:" + str(argparser.cmdargs.timeout) + "\r\n" \
               "MAN:\"ssdp:discover\"\r\n\r\n"
-    # Set up the UDP port, bind it, then send the M-SEARCH packet.
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    # Allow socket reuse
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        # Set up the UDP port, bind it, then send the M-SEARCH packet.
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # Allow socket reuse
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    except socket.error:
+        stderr.write("[ERROR] %s\n" % socket.error)
+        exit(1)
 
     # Bind the socket to the port, then send it
     sock.bind(("", int(argparser.cmdargs.port)))
-    sock.sendto(bytes(MESSAGE, "utf-8"), (argparser.cmdargs.ip, int(argparser.cmdargs.port)))
+    sock.sendto(bytes(message, "utf-8"), (argparser.cmdargs.ip, int(argparser.cmdargs.port)))
 
     # Reset the socket to receive instead, prepare to get all of the 200/OK packets
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -49,6 +55,7 @@ def scan_for_devices():
     message = ""
     while receiving:
         try:
+            # TODO: Should this be based on config?
             sock.settimeout(5.0)
             message = str(sock.recv(10240), 'utf-8')
             text_file = open("output.txt", "a")

@@ -35,6 +35,12 @@ In the root directory.
 
 All of the tests are contained in the ```/tests``` directory
 
+## Common Issues
+First, make sure you are running as root!
+
+Applications that are known to reserve port 1900:  
+```Spotify```
+
 ## Contributing
 Feel free to contribute! This tool is still in development, so look for #TODO tags if you would like to improve the stability of the overall application.
 
