@@ -25,7 +25,7 @@ class Device:
         self.usn = usn
         self.serviceList = []
 
-    def print_info(self, stdscr):
+    def print_info(self):
         info = "USN: \t\t{0}\n".format(repr(self.usn))
         info += "Cache: \t\t{0}\n".format(repr(self.cache))
         info += "Date: \t\t{0}\n".format(repr(self.date))
@@ -36,7 +36,8 @@ class Device:
         info += "Server: \t{0}\n".format(repr(self.server))
         info += "User Agent: \t{0}\n".format(repr(self.userAgent))
         info += "ST: \t\t{0}\n".format(repr(self.st))
-        scrollPad(stdscr, info)
+        print(info)
+        #scrollPad(stdscr, info)
 
     def print_services(self, stdscr):
         for service in self.serviceList:

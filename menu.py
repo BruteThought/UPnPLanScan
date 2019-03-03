@@ -19,6 +19,23 @@ def print_context():
         print("[*] Verbosity switch is on\n\n")
 
 
+# Print out the potential inputs that can be used for a command
+def print_menu_options(command):
+    print("[*] Options for command '{0}':\n".format(command))
+    if command == "list":
+        print("List: List a set of objects.\n")
+        print("devices - List discovered devices by USN")
+    if command == "info":
+        print("Info: Get more information about an object\n")
+        print("device - List info about a specified device")
+        print("\tIn: Device USN or * for all devices.")
+        print("\tOut:\t List of USN, Cache, Date, Location, Base, Opt")
+        print("\t\tNLS, Server, User Agent and ST")
+    else:
+        print("[*] No option info for command '{0}:\n".format(command))
+        print()  # Trailing newline
+
+
 # Print the main menu
 def get_command():
     # TODO: add tab completion.
@@ -28,24 +45,58 @@ def get_command():
         #  Could take a LONG time on busy networks, so maybe scan all/devices/services
         scan_for_devices()
         print(devices)
+
+    elif command[0] == "list":
+        valid = False
+        try:
+            if command[1] == "devices":
+                valid = True
+                for device in devices:
+                    print(device + "\n")
+        except (IndexError, ValueError):
+            valid = False
+        if not valid:
+            print_menu_options("list")
+
     elif command[0] == "help":
         # TODO: print out a list of the possible commands and how to use them
         print("Printing help")
+
+    # Print info about an object
     elif command[0] == "info":
         # TODO: should probably make it so that displaying device/service/function info are parsed differently.
-        print("Display info on a topic")
+        valid = False
+        try:
+            if command[1] == "device":
+                # Print info of all discovered devices
+                if command[2] == "*":
+                    valid = True
+                    for ULS in devices:
+                        devices[ULS].print_info()
+                else:
+                    # TODO: Allow users to select through using ULS or some other method.
+                    valid = True
+        except (IndexError, ValueError):
+            valid = False
+
+        if not valid:
+            print_menu_options("info")
+
     elif command[0] == "clear":
         # TODO: Clear the currently selected device
         print("Clearing device")
+
     elif command[0] == "alias":
         # TODO: Create an alias for a certain device (maybe the one currently selected? \
         #  Alternatively, could number in list and use that.)
         print("Creating alias")
+
     elif command[0] == "quit":
         quit()
         return True
+
     elif not command:
-        # Just loop back to waiting for a command.
+        # Just loop back to waiting for a command if nothing entered.
         pass
     else:
         # Print out an error
